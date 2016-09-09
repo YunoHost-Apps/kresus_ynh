@@ -1,0 +1,43 @@
+#!/bin/bash
+
+# Exit on command errors and treat unset variables as an error
+set -eu
+
+app=$YNH_APP_INSTANCE_NAME
+
+# Retrieve arguments
+	domain=$YNH_APP_ARG_DOMAIN
+	path=$YNH_APP_ARG_PATH
+
+# Source YunoHost helpers
+	source /usr/share/yunohost/helpers
+
+# Check domain/path availability
+	sudo yunohost app checkurl "${domain}${path}" -a "$app" \
+		|| ynh_die "Path not available: ${domain}${path}"
+
+# Install dependencies
+	sudo apt-get update
+	sudo apt-get install nodejs-legacy npm python-weboob-core python-imaging -y -qq
+	
+# Build the app
+	src_path=/home/yunohost.app/$app
+	sudo mkdir -p $src_path $src_path/node_modules
+	sudo git clone https://framagit.org/bnjbvr/kresus.git $src_path
+	sudo npm install --prefix $src_path $src_path
+	sudo .$src_path/scripts/build.sh
+
+# Modify Nginx configuration file and copy it to Nginx conf directory
+	nginx_conf=../conf/nginx.conf
+	sed -i "s@YNH_WWW_PATH@$path@g" $nginx_conf
+	sudo cp $nginx_conf /etc/nginx/conf.d/$domain.d/$app.conf
+
+# Setup service
+	systemd_service=../conf/kresus.service
+	sed -i "s@APP_TO_CHANGE@$app@g" $systemd_service
+	sudo cp $systemd_service /etc/systemd/system/$app.service
+	systemctl enable $app
+	systemctl start $app
+	
+# Reload services
+	sudo service nginx reload
