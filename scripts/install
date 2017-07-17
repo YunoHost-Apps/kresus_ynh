@@ -22,8 +22,8 @@ app=$YNH_APP_INSTANCE_NAME
 	
 # Build the app
 	src_path=/home/yunohost.app/$app
-	sudo mkdir -p $src_path $src_path/node_modules
 	sudo git clone https://framagit.org/bnjbvr/kresus.git $src_path
+	sudo mkdir -p $src_path $src_path/node_modules
 	sudo npm install --prefix $src_path $src_path
 	sudo .$src_path/scripts/build.sh
 
