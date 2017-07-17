@@ -25,7 +25,7 @@ app=$YNH_APP_INSTANCE_NAME
 	sudo git clone https://framagit.org/bnjbvr/kresus.git $src_path
 	sudo mkdir -p $src_path $src_path/node_modules
 	sudo npm install --prefix $src_path $src_path
-	sudo .$src_path/scripts/build.sh
+	sudo $src_path/scripts/build.sh
 
 # Modify Nginx configuration file and copy it to Nginx conf directory
 	nginx_conf=../conf/nginx.conf
