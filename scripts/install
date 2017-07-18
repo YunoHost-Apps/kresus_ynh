@@ -19,7 +19,7 @@ app=$YNH_APP_INSTANCE_NAME
 # Install dependencies
 	sudo apt-get update
 	sudo apt-get install nodejs-legacy npm python-weboob-core python-imaging -y -qq
-	
+
 # Build the app
 	src_path=/home/yunohost.app/$app
 	sudo git clone https://framagit.org/bnjbvr/kresus.git $src_path
@@ -34,10 +34,11 @@ app=$YNH_APP_INSTANCE_NAME
 
 # Setup service
 	systemd_service=../conf/kresus.service
-	sed -i "s@APP_TO_CHANGE@$app@g" $systemd_service
+	sed -i "s@YNH_HOME@$src_path@g" $systemd_service
+	sed -i "s@YNH_WWW_PATH@$path@g" $systemd_service
 	sudo cp $systemd_service /etc/systemd/system/$app.service
 	systemctl enable $app
 	systemctl start $app
-	
+
 # Reload services
 	sudo service nginx reload
