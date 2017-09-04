@@ -8,7 +8,7 @@ Kresus is an open-source libre self-hosted personal finance manager. It allows y
 It has started as a fork of cozy-pfm but is way different now.
 It was continued following this https://framagit.org/bnjbvr/kresus/issues/515
 
-**More information on the documentation page:**    
+**More information on the documentation page:**
 https://framagit.org/bnjbvr/kresus
 https://kresus.org
 https://yunohost.org/
