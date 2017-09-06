@@ -18,7 +18,7 @@ app=$YNH_APP_INSTANCE_NAME
 
 # Install dependencies
 	sudo apt-get update
-	sudo apt-get install nodejs-legacy npm python-weboob-core python-imaging -y -qq
+    sudo apt-get install nodejs-legacy npm python-pip python-dev python-lxml python-imaging -y -qq
     sudo pip install weboob
 
 # Build the app
