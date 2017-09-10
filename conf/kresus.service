@@ -4,7 +4,7 @@ After=syslog.target network.target
 
 [Service]
 WorkingDirectory=YNH_HOME
-Environment=NODE_ENV=production HOME=YNH_HOME KRESUS_URL_PREFIX=/$path
+Environment=NODE_ENV=production HOME=YNH_HOME KRESUS_URL_PREFIX=YNH_WWW_PATH
 ExecStart=/usr/bin/node bin/kresus.js
 Type=simple
 Restart=always
