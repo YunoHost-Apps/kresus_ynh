@@ -34,7 +34,6 @@ app=$YNH_APP_INSTANCE_NAME
 # Setup service
     systemd_service=../conf/kresus.service
     sed -i "s@YNH_HOME@$src_path@g" $systemd_service
-    sed -i "s@YNH_WWW_PATH@$path@g" $systemd_service
     sudo cp $systemd_service /etc/systemd/system/$app.service
     systemctl enable $app
     systemctl start $app
