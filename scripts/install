@@ -32,7 +32,7 @@ apt-get install nodejs-legacy npm python-pip python-dev python-lxml python-imagi
 pip install weboob
 
 # Install Kresus
-sudo -u $app sh -c "npm install kresus"
+sudo -u $app sh -c 'cd $final_path && prefix=$final_path npm install kresus'
 
 # Modify Nginx configuration file and copy it to Nginx conf directory
 nginx_conf=../conf/nginx.conf
