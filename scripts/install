@@ -6,37 +6,37 @@ set -eu
 app=$YNH_APP_INSTANCE_NAME
 
 # Retrieve arguments
-    domain=$YNH_APP_ARG_DOMAIN
-    path=$YNH_APP_ARG_PATH
+domain=$YNH_APP_ARG_DOMAIN
+path=$YNH_APP_ARG_PATH
 
 # Source YunoHost helpers
-    source /usr/share/yunohost/helpers
+source /usr/share/yunohost/helpers
 
 # Check domain/path availability
-    sudo yunohost app checkurl "${domain}${path}" -a "$app" \
-        || ynh_die "Path not available: ${domain}${path}"
+sudo yunohost app checkurl "${domain}${path}" -a "$app" \
+|| ynh_die "Path not available: ${domain}${path}"
 
 # Install dependencies
-    sudo apt-get update
-    sudo apt-get install nodejs-legacy npm python-pip python-dev python-lxml python-imaging -y -qq
-    sudo pip install weboob
+sudo apt-get update
+sudo apt-get install nodejs-legacy npm python-pip python-dev python-lxml python-imaging -y -qq
+sudo pip install weboob
 
 # Build the app
-    src_path=/home/yunohost.app/$app
-    sudo git clone https://framagit.org/bnjbvr/kresus.git $src_path
-    sudo sh -c "cd $src_path && make install"
+src_path=/home/yunohost.app/$app
+sudo git clone https://framagit.org/bnjbvr/kresus.git $src_path
+sudo sh -c "cd $src_path && make install"
 
 # Modify Nginx configuration file and copy it to Nginx conf directory
-    nginx_conf=../conf/nginx.conf
-    sed -i "s@YNH_WWW_PATH@$path@g" $nginx_conf
-    sudo cp $nginx_conf /etc/nginx/conf.d/$domain.d/$app.conf
+nginx_conf=../conf/nginx.conf
+sed -i "s@YNH_WWW_PATH@$path@g" $nginx_conf
+sudo cp $nginx_conf /etc/nginx/conf.d/$domain.d/$app.conf
 
 # Setup service
-    systemd_service=../conf/kresus.service
-    sed -i "s@YNH_HOME@$src_path@g" $systemd_service
-    sudo cp $systemd_service /etc/systemd/system/$app.service
-    systemctl enable $app
-    systemctl start $app
+systemd_service=../conf/kresus.service
+sed -i "s@YNH_HOME@$src_path@g" $systemd_service
+sudo cp $systemd_service /etc/systemd/system/$app.service
+systemctl enable $app
+systemctl start $app
 
 # Reload services
-    sudo service nginx reload
+sudo service nginx reload

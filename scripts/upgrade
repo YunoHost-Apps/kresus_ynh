@@ -6,30 +6,30 @@ set -eu
 app=$YNH_APP_INSTANCE_NAME
 
 # Source YunoHost helpers
-	source /usr/share/yunohost/helpers
+source /usr/share/yunohost/helpers
 
 # Retrieve app settings
-	domain=$(ynh_app_setting_get "$app" domain)
-	path=$(ynh_app_setting_get "$app" path)
+domain=$(ynh_app_setting_get "$app" domain)
+path=$(ynh_app_setting_get "$app" path)
 
 # Build the app
-	src_path=/home/yunohost.app/$app
-	sudo mkdir -p $src_path $src_path/node_modules
-	sudo git clone https://framagit.org/bnjbvr/kresus.git $src_path
-	sudo npm install --prefix $src_path $src_path
-	sudo .$src_path/scripts/build.sh
+src_path=/home/yunohost.app/$app
+sudo mkdir -p $src_path $src_path/node_modules
+sudo git clone https://framagit.org/bnjbvr/kresus.git $src_path
+sudo npm install --prefix $src_path $src_path
+sudo .$src_path/scripts/build.sh
 
 # Modify Nginx configuration file and copy it to Nginx conf directory
-	nginx_conf=../conf/nginx.conf
-	sed -i "s@YNH_WWW_PATH@$path@g" $nginx_conf
-	sudo cp $nginx_conf /etc/nginx/conf.d/$domain.d/$app.conf
+nginx_conf=../conf/nginx.conf
+sed -i "s@YNH_WWW_PATH@$path@g" $nginx_conf
+sudo cp $nginx_conf /etc/nginx/conf.d/$domain.d/$app.conf
 
 # Setup service
-	systemd_service=../conf/kresus.service
-	sed -i "s@APP_TO_CHANGE@$app@g" $systemd_service
-	sudo cp $systemd_service /etc/systemd/system/$app.service
-	systemctl enable $app
-	systemctl start $app
-	
+systemd_service=../conf/kresus.service
+sed -i "s@APP_TO_CHANGE@$app@g" $systemd_service
+sudo cp $systemd_service /etc/systemd/system/$app.service
+systemctl enable $app
+systemctl start $app
+
 # Reload nginx service
-	sudo service nginx reload
+sudo service nginx reload
