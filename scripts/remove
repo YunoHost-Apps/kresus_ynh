@@ -17,3 +17,6 @@ sudo rm -f /etc/systemd/system/$app.service
 
 # Reload nginx service
 sudo service nginx reload
+
+# Remove dedicated system user
+ynh_system_user_delete $app

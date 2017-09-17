@@ -9,12 +9,22 @@ app=$YNH_APP_INSTANCE_NAME
 domain=$YNH_APP_ARG_DOMAIN
 path=$YNH_APP_ARG_PATH
 
+# Compute parameters
+final_path=/home/yunohost.app/$app
+
 # Source YunoHost helpers
 source /usr/share/yunohost/helpers
 
 # Check domain/path availability
 sudo yunohost app checkurl "${domain}${path}" -a "$app" \
 || ynh_die "Path not available: ${domain}${path}"
+
+# Check system user availability
+if ynh_system_user_exists "$app" ; then
+    ynh_die "System user $app already exists !"
+else
+    ynh_system_user_create "$app" "$final_path"
+fi
 
 # Install dependencies
 sudo apt-get update
