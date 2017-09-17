@@ -10,7 +10,7 @@ domain=$YNH_APP_ARG_DOMAIN
 path=$YNH_APP_ARG_PATH
 
 # Compute parameters
-final_path=/home/yunohost.app/$app
+install_path=/home/yunohost.app/$app
 
 # Source YunoHost helpers
 source /usr/share/yunohost/helpers
@@ -23,18 +23,16 @@ sudo yunohost app checkurl "${domain}${path}" -a "$app" \
 if ynh_system_user_exists "$app" ; then
     ynh_die "System user $app already exists !"
 else
-    ynh_system_user_create "$app" "$final_path"
+    ynh_system_user_create "$app" "$install_path"
 fi
 
 # Install dependencies
-sudo apt-get update
-sudo apt-get install nodejs-legacy npm python-pip python-dev python-lxml python-imaging -y -qq
-sudo pip install weboob
+apt-get update
+apt-get install nodejs-legacy npm python-pip python-dev python-lxml python-imaging -y -qq
+pip install weboob
 
-# Build the app
-src_path=/home/yunohost.app/$app
-sudo git clone https://framagit.org/bnjbvr/kresus.git $src_path
-sudo sh -c "cd $src_path && make install"
+# Install Kresus
+sudo -i -u $app sh -c "nmp install kresus"
 
 # Modify Nginx configuration file and copy it to Nginx conf directory
 nginx_conf=../conf/nginx.conf
@@ -43,7 +41,7 @@ sudo cp $nginx_conf /etc/nginx/conf.d/$domain.d/$app.conf
 
 # Setup service
 systemd_service=../conf/kresus.service
-sed -i "s@YNH_HOME@$src_path@g" $systemd_service
+sed -i "s@YNH_HOME@$install_path@g" $systemd_service
 sudo cp $systemd_service /etc/systemd/system/$app.service
 systemctl enable $app
 systemctl start $app
