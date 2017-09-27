@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -u
+
 app=$YNH_APP_INSTANCE_NAME
 
 # Source YunoHost helpers
@@ -11,9 +13,8 @@ domain=$(ynh_app_setting_get "$app" domain)
 # Remove sources
 systemctl stop $app
 systemctl disable $app
-sudo rm -rf /home/yunohost.app/$app
-sudo rm -f /etc/nginx/conf.d/$domain.d/$app.conf
-sudo rm -f /etc/systemd/system/$app.service
+ynh_secure_remove /etc/nginx/conf.d/$domain.d/$app.conf
+ynh_secure_remove /etc/systemd/system/$app.service
 
 # Reload nginx service
 sudo service nginx reload

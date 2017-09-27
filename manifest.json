@@ -18,7 +18,6 @@
     "multi_instance": true,
     "services": [
         "nginx",
-        "node"
     ],
     "arguments": {
         "install" : [
