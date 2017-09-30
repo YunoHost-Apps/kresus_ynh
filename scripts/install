@@ -10,13 +10,13 @@ domain=$YNH_APP_ARG_DOMAIN
 path=$YNH_APP_ARG_PATH
 
 # Compute parameters
-install_path=/home/yunohost.app/$app
+install_path="/home/ynh$app"
 
 # Source YunoHost helpers
 source /usr/share/yunohost/helpers
 
 # Check domain/path availability
-sudo yunohost app checkurl "${domain}${path}" -a "$app" \
+yunohost app checkurl "${domain}${path}" -a "$app" \
 || ynh_die "Path not available: ${domain}${path}"
 
 # Check system user availability
