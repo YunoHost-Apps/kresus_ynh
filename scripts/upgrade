@@ -20,31 +20,146 @@ ynh_abort_if_errors
 
 app=$YNH_APP_INSTANCE_NAME
 
-# Source YunoHost helpers
-source /usr/share/yunohost/helpers
+domain=$(ynh_app_setting_get $app domain)
+path_url=$(ynh_app_setting_get $app path)
+final_path=$(ynh_app_setting_get $app final_path)
+port=$(ynh_app_setting_get $app port)
 
-# Retrieve app settings
-# domain=$(ynh_app_setting_get "$app" domain)
-# path=$(ynh_app_setting_get "$app" path)
+#=================================================
+# ENSURE DOWNWARD COMPATIBILITY
+#=================================================
 
-# Build the app
-# src_path=/home/yunohost.app/$app
-# mkdir -p $src_path $src_path/node_modules
-# git clone https://framagit.org/bnjbvr/kresus.git $src_path
-# npm install --prefix $src_path $src_path
-# .$src_path/scripts/build.sh
+# If final_path doesn't exist, create it
+if [ -z $final_path ]; then
+	final_path=/var/www/$app
+	ynh_app_setting_set $app final_path $final_path
+fi
 
-# Modify Nginx configuration file and copy it to Nginx conf directory
-# nginx_conf=../conf/nginx.conf
-# sed -i "s@YNH_WWW_PATH@$path@g" $nginx_conf
-# cp $nginx_conf /etc/nginx/conf.d/$domain.d/$app.conf
+#=================================================
+# BACKUP BEFORE UPGRADE THEN ACTIVE TRAP
+#=================================================
 
-# Setup service
-# systemd_service=../conf/kresus.service
-# sed -i "s@APP_TO_CHANGE@$app@g" $systemd_service
-# cp $systemd_service /etc/systemd/system/$app.service
-# systemctl enable $app
-# systemctl start $app
+# Backup the current version of the app
+# ynh_backup_before_upgrade
+# ynh_clean_setup () {
+	# restore it if the upgrade fails
+# 	ynh_restore_upgradebackup
+# }
 
-# Reload nginx service
-service nginx reload
+# Exit if an error occurs during the execution of the script
+ynh_abort_if_errors
+
+#=================================================
+# CHECK THE PATH
+#=================================================
+
+# Normalize the URL path syntax
+path_url=$(ynh_normalize_url_path $path_url)
+
+#=================================================
+# STANDARD UPGRADE STEPS
+#=================================================
+# INSTALL DEPENDENCIES
+#=================================================
+
+ynh_install_app_dependencies dh-autoreconf \
+	python-pip python-dev python-lxml python-imaging python-virtualenv
+
+#=================================================
+# DOWNLOAD, CHECK AND UNPACK SOURCE
+#=================================================
+
+# Download, check integrity, uncompress and patch the source from app.src
+ynh_setup_source "$final_path"
+mkdir -p "$final_path/data"
+
+#=================================================
+# NGINX CONFIGURATION
+#=================================================
+
+# Create a dedicated nginx config
+ynh_add_nginx_config
+
+#=================================================
+# CREATE DEDICATED USER
+#=================================================
+
+# Create a system user
+ynh_system_user_create "$app"
+
+
+#=================================================
+# SPECIFIC UPGRADE
+#=================================================
+# Install nodesjs
+#=================================================
+
+# install nodejs
+ynh_install_nodejs 8
+
+#=================================================
+# Install weboob with pip
+#=================================================
+
+virtualenv "${final_path}/venv"
+(
+	set +o nounset
+	source "${final_path}/venv/bin/activate"
+	set -o nounset
+
+	pip install --upgrade pip
+	pip install weboob
+)
+
+#=================================================
+# Install Kresus with npm
+#=================================================
+
+ynh_use_nodejs
+(
+	cd "$final_path"
+	chown -R $app: "$final_path"
+	npm install --unsafe-perm
+	npm run build:prod
+)
+
+#=================================================
+# CONFIGURE HASTE
+#=================================================
+
+cp ../conf/config.ini "$final_path/config.ini"
+
+ynh_replace_string "__PORT__"          "$port"       "$final_path/config.ini"
+ynh_replace_string "__PATH__"          "$path_url"   "$final_path/config.ini"
+ynh_replace_string "__FINALPATH__"     "$final_path" "$final_path/config.ini"
+
+# Calculate and store the config file checksum into the app settings
+ynh_store_file_checksum "$final_path/config.ini"
+
+#=================================================
+# SETUP SYSTEMD
+#=================================================
+
+ynh_replace_string "__NODEJS__"   "$nodejs_use_version"       ../conf/systemd.service
+ynh_replace_string "__ENV_PATH__" "$PATH"                     ../conf/systemd.service
+ynh_replace_string "__NODEPATH__" "$(dirname "$nodejs_path")" ../conf/systemd.service
+
+# Create a dedicated systemd config
+ynh_add_systemd_config
+
+#=================================================
+# GENERIC FINALIZATION
+#=================================================
+# SECURE FILES AND DIRECTORIES
+#=================================================
+
+# Set right permissions for curl installation
+chown -R $app: $final_path
+chmod 600 "$final_path/config.ini"
+
+#=================================================
+# RELOAD NGINX
+#=================================================
+
+service "$app" restart
+systemctl reload nginx

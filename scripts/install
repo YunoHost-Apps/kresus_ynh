@@ -56,13 +56,13 @@ ynh_app_setting_set "$app" port "$port"
 # INSTALL DEPENDENCIES
 #=================================================
 
-ynh_install_app_dependencies python-pip python-dev python-lxml python-imaging python-virtualenv
+ynh_install_app_dependencies dh-autoreconf \
+	python-pip python-dev python-lxml python-imaging python-virtualenv
 
 #=================================================
 # DOWNLOAD, CHECK AND UNPACK SOURCE
 #=================================================
 
-# TODO: this app should be installable from a specific version
 ynh_app_setting_set "$app" final_path "$final_path"
 
 # Download, check integrity, uncompress and patch the source from app.src
@@ -154,4 +154,5 @@ chmod 600 "$final_path/config.ini"
 # RELOAD NGINX
 #=================================================
 
+service "$app" start
 service nginx reload

@@ -24,7 +24,7 @@
 	Level 1=auto
 	Level 2=auto
 	Level 3=auto
-# Level 4: https://github.com/YunoHost-Apps/weblate_ynh/issues/4
+# Level 4: kresus doesn't support any user
 	Level 4=1
 # Level 5:
 	Level 5=auto
