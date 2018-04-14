@@ -96,24 +96,15 @@ ynh_install_nodejs 8
 # Install weboob with pip
 #=================================================
 
-# TODO: use virtualenv
-# virtualenv "${final_path}/venv"
-# (
-# 	set +o nounset
-# 	source "${final_path}/venv/bin/activate"
-# 	set -o nounset
+virtualenv "${final_path}/venv"
+(
+	set +o nounset
+	source "${final_path}/venv/bin/activate"
+	set -o nounset
 
-# 	pip install --upgrade pip
-
-# )
-pip install weboob
-
-#=================================================
-# SECURE FILES AND DIRECTORIES
-#=================================================
-
-# Set permissions to app files
-# chown -R $app: $final_path
+	pip install --upgrade pip
+	pip install weboob
+)
 
 #=================================================
 # Install Kresus with npm
@@ -150,6 +141,14 @@ ynh_replace_string "__NODEPATH__" "$(dirname "$nodejs_path")" ../conf/systemd.se
 
 # Create a dedicated systemd config
 ynh_add_systemd_config
+
+#=================================================
+# SECURE FILES AND DIRECTORIES
+#=================================================
+
+# Set permissions to app files
+chown -R $app: $final_path
+chmod 600 "$final_path/config.ini"
 
 #=================================================
 # RELOAD NGINX
