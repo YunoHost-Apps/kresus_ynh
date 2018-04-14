@@ -1,23 +1,60 @@
 #!/bin/bash
 
-set -u
+#=================================================
+# GENERIC START
+#=================================================
+# IMPORT GENERIC HELPERS
+#=================================================
+
+source _common.sh
+source /usr/share/yunohost/helpers
+
+#=================================================
+# LOAD SETTINGS
+#=================================================
 
 app=$YNH_APP_INSTANCE_NAME
 
-# Source YunoHost helpers
-source /usr/share/yunohost/helpers
-
-# Retrieve app settings
 domain=$(ynh_app_setting_get "$app" domain)
+port=$(ynh_app_setting_get "$app" port)
+final_path=$(ynh_app_setting_get "$app" final_path)
 
-# Remove sources
-systemctl stop $app
-systemctl disable $app
-ynh_secure_remove /etc/nginx/conf.d/$domain.d/$app.conf
-ynh_secure_remove /etc/systemd/system/$app.service
+#=================================================
+# STANDARD REMOVE
+#=================================================
+# STOP AND REMOVE SERVICE
+#=================================================
 
-# Reload nginx service
-sudo service nginx reload
+# Remove the dedicated systemd config
+ynh_remove_systemd_config
 
-# Remove dedicated system user
-ynh_system_user_delete $app
+#=================================================
+# REMOVE DEPENDENCIES
+#=================================================
+
+# Remove metapackage and its dependencies
+ynh_remove_app_dependencies
+ynh_remove_nodejs
+
+#=================================================
+# REMOVE APP MAIN DIR
+#=================================================
+
+# Remove the app directory securely
+ynh_secure_remove "$final_path"
+
+#=================================================
+# REMOVE NGINX CONFIGURATION
+#=================================================
+
+# Remove the dedicated nginx config
+ynh_remove_nginx_config
+
+#=================================================
+# GENERIC FINALIZATION
+#=================================================
+# REMOVE DEDICATED USER
+#=================================================
+
+# Delete a system user
+ynh_system_user_delete "$app"

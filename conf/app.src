@@ -1,0 +1,6 @@
+SOURCE_URL=https://framagit.org/bnjbvr/kresus/repository/0.13.1/archive.tar.bz2
+SOURCE_SUM=0fc6679e564f151b6671aa4768a863f3acb10cf7b4ed116ab6b7d22a9e53e76a
+SOURCE_SUM_PRG=sha256sum
+SOURCE_FORMAT=tar.gz
+SOURCE_IN_SUBDIR=true
+SOURCE_FILENAME=
