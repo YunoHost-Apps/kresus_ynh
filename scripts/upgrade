@@ -35,6 +35,11 @@ if [ -z $final_path ]; then
 	ynh_app_setting_set $app final_path $final_path
 fi
 
+if [ -z "/home/ynh$app"]; then
+	mv "/home/ynh$app/data" "$final_path/data"
+	ynh_secure_remove "/home/ynh$app"
+fi
+
 #=================================================
 # BACKUP BEFORE UPGRADE THEN ACTIVE TRAP
 #=================================================
