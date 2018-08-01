@@ -7,14 +7,15 @@
         "fr": "Kresus est un outil personnel de gestion de finances."
     },
     "url": "https://framagit.org/bnjbvr/kresus",
-    "license": "free",
+    "license": "AGPL-3.0-only",
     "maintainer": {
         "name": "Scith",
         "url": "https://github.com/scith"
     },
     "requirements": {
-        "yunohost": ">= 2.6.4"
+        "yunohost": ">= 2.7.10"
     },
+    "version": "0.13.2-2",
     "multi_instance": true,
     "services": [
         "nginx"
@@ -23,7 +24,7 @@
         "install" : [
             {
                 "name": "domain",
-				"type": "domain",
+		"type": "domain",
                 "ask": {
                     "en": "Choose a domain name for Kresus",
                     "fr": "Choisissez un nom de domaine pour Kresus"
@@ -32,7 +33,7 @@
             },
             {
                 "name": "path",
-				"type": "path",
+		"type": "path",
                 "ask": {
                     "en": "Choose a path for Kresus",
                     "fr": "Choisissez un chemin pour Kresus"

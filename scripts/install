@@ -1,50 +1,158 @@
 #!/bin/bash
 
-# Exit on command errors and treat unset variables as an error
-set -eu
+#=================================================
+# GENERIC START
+#=================================================
+# IMPORT GENERIC HELPERS
+#=================================================
 
-app=$YNH_APP_INSTANCE_NAME
+source _common.sh
+source /usr/share/yunohost/helpers
+
+#=================================================
+# MANAGE SCRIPT FAILURE
+#=================================================
+
+# Exit if an error occurs during the execution of the script
+ynh_abort_if_errors
+
+#=================================================
+# RETRIEVE ARGUMENTS FROM THE MANIFEST
+#================================================
 
 # Retrieve arguments
 domain=$YNH_APP_ARG_DOMAIN
-path=$YNH_APP_ARG_PATH
+path_url=$YNH_APP_ARG_PATH
+port=$(ynh_find_port 9876)
 
-# Compute parameters
-install_path="/home/ynh$app"
+app=$YNH_APP_INSTANCE_NAME
 
-# Source YunoHost helpers
-source /usr/share/yunohost/helpers
+#=================================================
+# CHECK IF THE APP CAN BE INSTALLED WITH THESE ARGS
+#=================================================
 
-# Check domain/path availability
-yunohost app checkurl "${domain}${path}" -a "$app" \
-|| ynh_die "Path not available: ${domain}${path}"
+final_path="/var/www/$app"
+test ! -e "$final_path" || ynh_die "This path already contains a folder"
 
-# Check system user availability
-if ynh_system_user_exists "$app" ; then
-    ynh_die "System user $app already exists !"
-else
-    ynh_system_user_create "$app" "$install_path"
-fi
+# Normalize the url path syntax
+path_url=$(ynh_normalize_url_path "$path_url")
 
-# Install dependencies
-apt-get update
-apt-get install nodejs-legacy npm python-pip python-dev python-lxml python-imaging -y -qq
-pip install weboob
+# Check web path availability
+ynh_webpath_available "$domain" "$path_url"
+# Register (book) web path
+ynh_webpath_register "$app" "$domain" "$path_url"
 
-# Install Kresus
-sudo -u $app sh -c 'cd $final_path && prefix=$final_path npm install kresus'
+#=================================================
+# STORE SETTINGS FROM MANIFEST
+#=================================================
 
-# Modify Nginx configuration file and copy it to Nginx conf directory
-nginx_conf=../conf/nginx.conf
-sed -i "s@YNH_WWW_PATH@$path@g" $nginx_conf
-sudo cp $nginx_conf /etc/nginx/conf.d/$domain.d/$app.conf
+ynh_app_setting_set "$app" domain "$domain"
+ynh_app_setting_set "$app" path "$path_url"
+ynh_app_setting_set "$app" port "$port"
 
-# Setup service
-systemd_service=../conf/kresus.service
-sed -i "s@YNH_HOME@$install_path@g" $systemd_service
-sudo cp $systemd_service /etc/systemd/system/$app.service
-systemctl enable $app
-systemctl start $app
+#=================================================
+# STANDARD MODIFICATIONS
+#=================================================
+# INSTALL DEPENDENCIES
+#=================================================
 
-# Reload services
-sudo service nginx reload
+ynh_install_app_dependencies dh-autoreconf \
+	python-pip python-dev python-lxml python-imaging python-virtualenv
+
+#=================================================
+# DOWNLOAD, CHECK AND UNPACK SOURCE
+#=================================================
+
+ynh_app_setting_set "$app" final_path "$final_path"
+
+# Download, check integrity, uncompress and patch the source from app.src
+ynh_setup_source "$final_path"
+mkdir "$final_path/data"
+
+#=================================================
+# NGINX CONFIGURATION
+#=================================================
+
+# Create a dedicated nginx config
+ynh_add_nginx_config
+
+#=================================================
+# CREATE DEDICATED USER
+#=================================================
+
+# Create a system user
+ynh_system_user_create "$app"
+
+#=================================================
+# SPECIFIC SETUP
+#=================================================
+# Install nodesjs
+#=================================================
+
+# install nodejs
+ynh_install_nodejs 8
+
+#=================================================
+# Install weboob with pip
+#=================================================
+
+virtualenv "${final_path}/venv"
+(
+	set +o nounset
+	source "${final_path}/venv/bin/activate"
+	set -o nounset
+
+	pip install --upgrade pip
+	pip install weboob
+)
+
+#=================================================
+# Install Kresus with npm
+#=================================================
+
+ynh_use_nodejs
+(
+	cd "$final_path"
+	chown -R $app: "$final_path"
+	npm install --unsafe-perm
+	npm run build:prod
+)
+
+#=================================================
+# CONFIGURE HASTE
+#=================================================
+
+cp ../conf/config.ini "$final_path/config.ini"
+
+ynh_replace_string "__PORT__"          "$port"       "$final_path/config.ini"
+ynh_replace_string "__PATH__"          "$path_url"   "$final_path/config.ini"
+ynh_replace_string "__FINALPATH__"     "$final_path" "$final_path/config.ini"
+
+# Calculate and store the config file checksum into the app settings
+ynh_store_file_checksum "$final_path/config.ini"
+
+#=================================================
+# SETUP SYSTEMD
+#=================================================
+
+ynh_replace_string "__NODEJS__"   "$nodejs_use_version"       ../conf/systemd.service
+ynh_replace_string "__ENV_PATH__" "$PATH"                     ../conf/systemd.service
+ynh_replace_string "__NODEPATH__" "$(dirname "$nodejs_path")" ../conf/systemd.service
+
+# Create a dedicated systemd config
+ynh_add_systemd_config
+
+#=================================================
+# SECURE FILES AND DIRECTORIES
+#=================================================
+
+# Set permissions to app files
+chown -R $app: $final_path
+chmod 600 "$final_path/config.ini"
+
+#=================================================
+# RELOAD NGINX
+#=================================================
+
+service "$app" start
+service nginx reload
