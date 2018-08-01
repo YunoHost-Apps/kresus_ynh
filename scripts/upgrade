@@ -113,7 +113,7 @@ virtualenv "${final_path}/venv"
 	set -o nounset
 
 	pip install --upgrade pip
-	pip install weboob
+	pip install weboob html2text simplejson BeautifulSoup PyExecJS
 )
 
 #=================================================
@@ -124,8 +124,7 @@ ynh_use_nodejs
 (
 	cd "$final_path"
 	chown -R $app: "$final_path"
-	npm install --unsafe-perm
-	npm run build:prod
+	npm install --production --unsafe-perm
 )
 
 #=================================================
