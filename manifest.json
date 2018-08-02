@@ -9,13 +9,13 @@
     "url": "https://framagit.org/bnjbvr/kresus",
     "license": "AGPL-3.0-only",
     "maintainer": {
-        "name": "Scith",
-        "url": "https://github.com/scith"
+        "name": "Jean-Baptiste Holcroft",
+        "email": "jean-baptiste@holcroft.fr"
     },
     "requirements": {
-        "yunohost": ">= 2.7.10"
+        "yunohost": ">= 2.7.14"
     },
-    "version": "0.13.2-2",
+    "version": "0.13.2~ynh2",
     "multi_instance": true,
     "services": [
         "nginx"
