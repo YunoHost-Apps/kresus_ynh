@@ -35,7 +35,7 @@ if [ -z $final_path ]; then
 	ynh_app_setting_set $app final_path $final_path
 fi
 
-if [ -z "/home/ynh$app"]; then
+if [ -z "/home/ynh$app" ]; then
 	mv "/home/ynh$app/data" "$final_path/data"
 	ynh_secure_remove "/home/ynh$app"
 fi
@@ -84,6 +84,11 @@ mkdir -p "$final_path/data"
 
 # Create a dedicated nginx config
 ynh_add_nginx_config
+if [ "$path_url" != "/" ]
+then
+	ynh_replace_string "^#sub_path_only" "" "/etc/nginx/conf.d/$domain.d/$app.conf"
+fi
+ynh_store_file_checksum "/etc/nginx/conf.d/$domain.d/$app.conf"
 
 #=================================================
 # CREATE DEDICATED USER
@@ -113,7 +118,7 @@ virtualenv "${final_path}/venv"
 	set -o nounset
 
 	pip install --upgrade pip
-	pip install weboob
+	pip install weboob html2text simplejson BeautifulSoup PyExecJS
 )
 
 #=================================================
@@ -124,8 +129,7 @@ ynh_use_nodejs
 (
 	cd "$final_path"
 	chown -R $app: "$final_path"
-	npm install --unsafe-perm
-	npm run build:prod
+	npm install --production --unsafe-perm
 )
 
 #=================================================

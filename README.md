@@ -1,14 +1,27 @@
-WARNING: this package has not been tested. Use it at your own risks, for testing purposes and not on a daily used server.
-
-
 # Kresus for YunoHost
 
 Kresus is an open-source libre self-hosted personal finance manager. It allows you to safely track your banking history, check your overall balance and know exactly on what you are spending money with the use of tags!
 
-It has started as a fork of cozy-pfm but is way different now.
-It was continued following this https://framagit.org/bnjbvr/kresus/issues/515
+**Shipped version:** 0.13.2
 
-**More information on the documentation page:**
-https://framagit.org/bnjbvr/kresus
-https://kresus.org
-https://yunohost.org/
+# State of this package
+
+* works fine:
+
+  * [x] install/remove/backup/remove/upgrade with x86_64
+
+* to be confirmed
+  * [x] ARM support
+
+* to be added:
+  * [ ] Email support
+  * [ ] Restrict more file access ($app is owner of everything, we should limit it more)
+  * [ ] Add user who will access the app (by default every one has access to the installed app)
+  * [ ] Email admin about installation with ynh_send_readme_to_admin helper
+
+## Links
+
+ * Report a bug about this package: https://github.com/YunoHost-Apps/kresus_ynh
+ * Report a bug about Kresus itself: https://framagit.org/kresusapp/kresus
+ * Kresus website: https://kresus.org
+ * YunoHost website: https://yunohost.org/
