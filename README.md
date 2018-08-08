@@ -15,6 +15,7 @@ Kresus is an open-source libre self-hosted personal finance manager. It allows y
 
 * to be added:
   * [ ] Email support
+  * [ ] Improve log file and add logrotate
   * [ ] Add user who will access the app (by default every one has access to the installed app)
 
 ## Links
