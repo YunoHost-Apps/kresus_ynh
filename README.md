@@ -12,7 +12,6 @@ Kresus is an open-source libre self-hosted personal finance manager. It allows y
 
 * to be confirmed
   * [x] ARM support
-  * [ ] install at the root of a sub-domain
 
 * to be added:
   * [ ] Email support
