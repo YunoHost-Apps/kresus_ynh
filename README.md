@@ -15,13 +15,12 @@ Kresus is an open-source libre self-hosted personal finance manager. It allows y
 
 * to be added:
   * [ ] Email support
-  * [ ] Restrict more file access ($app is owner of everything, we should limit it more)
+  * [ ] Improve log file and add logrotate
   * [ ] Add user who will access the app (by default every one has access to the installed app)
-  * [ ] Email admin about installation with ynh_send_readme_to_admin helper
 
 ## Links
 
  * Report a bug about this package: https://github.com/YunoHost-Apps/kresus_ynh
  * Report a bug about Kresus itself: https://framagit.org/kresusapp/kresus
  * Kresus website: https://kresus.org
- * YunoHost website: https://yunohost.org/
+ * YunoHost website: https://yunohost.org
