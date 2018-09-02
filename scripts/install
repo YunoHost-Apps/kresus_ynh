@@ -57,7 +57,8 @@ ynh_app_setting_set "$app" port "$port"
 #=================================================
 
 ynh_install_app_dependencies dh-autoreconf \
-	python-pip python-dev python-lxml python-imaging python-virtualenv
+	python-pip python-dev python-lxml python-imaging python-virtualenv \
+	libxslt-dev libjpeg-dev libxml2-dev
 
 #=================================================
 # DOWNLOAD, CHECK AND UNPACK SOURCE
@@ -102,7 +103,7 @@ ynh_install_nodejs 8
 # Install weboob with pip
 #=================================================
 
-virtualenv "${final_path}/venv"
+virtualenv --system-site-packages "${final_path}/venv"
 (
 	set +o nounset
 	source "${final_path}/venv/bin/activate"
