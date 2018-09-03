@@ -66,8 +66,7 @@ path_url=$(ynh_normalize_url_path $path_url)
 #=================================================
 
 ynh_install_app_dependencies dh-autoreconf \
-	python-pip python-dev python-lxml python-imaging python-virtualenv \
-	libxslt-dev libjpeg-dev libxml2-dev
+	python-pip python-dev python-lxml python-imaging python-virtualenv
 
 #=================================================
 # DOWNLOAD, CHECK AND UNPACK SOURCE

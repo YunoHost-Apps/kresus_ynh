@@ -57,8 +57,7 @@ ynh_app_setting_set "$app" port "$port"
 #=================================================
 
 ynh_install_app_dependencies dh-autoreconf \
-	python-pip python-dev python-lxml python-imaging python-virtualenv \
-	libxslt-dev libjpeg-dev libxml2-dev
+	python-pip python-dev python-lxml python-imaging python-virtualenv
 
 #=================================================
 # DOWNLOAD, CHECK AND UNPACK SOURCE
