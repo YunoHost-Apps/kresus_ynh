@@ -13,6 +13,14 @@ Environment=NODE_ENV=production
 Environment=HOME=__NODEPATH__
 ExecStart=__FINALPATH__/bin/kresus.js --config __FINALPATH__/config.ini
 Restart=always
+NoNewPrivileges=true
+PrivateDevices=true
+PrivateTmp=true
+ProtectHome=true
+ProtectSystem=strict
+ProtectControlGroups=yes
+ProtectKernelModules=yes
+ReadWritePaths=__FINALPATH__/config.ini __FINALPATH__/data/
 
 StandardOutput=syslog
 StandardError=syslog
