@@ -151,6 +151,9 @@ ynh_add_systemd_config
 # SECURE FILES AND DIRECTORIES
 #=================================================
 
+# Reset permissions
+chown -R root:root "$final_path"
+
 # Set permissions to app files
 chown -R "$app":"$app" "$final_path/data/"
 chmod -R 750 "$final_path/data/"
