@@ -102,7 +102,7 @@ ynh_install_nodejs 8
 # Install weboob with pip
 #=================================================
 
-virtualenv "${final_path}/venv"
+virtualenv --system-site-packages "${final_path}/venv"
 (
 	set +o nounset
 	source "${final_path}/venv/bin/activate"
@@ -151,8 +151,15 @@ ynh_add_systemd_config
 # SECURE FILES AND DIRECTORIES
 #=================================================
 
+# Reset permissions
+chown -R root:root "$final_path"
+
 # Set permissions to app files
-chown -R $app: $final_path
+chown -R "$app":"$app" "$final_path/data/"
+chmod -R 750 "$final_path/data/"
+
+# Set permissions to config file
+chown "$app" "$final_path/config.ini"
 chmod 600 "$final_path/config.ini"
 
 #=================================================
@@ -161,3 +168,23 @@ chmod 600 "$final_path/config.ini"
 
 service "$app" start
 service nginx reload
+
+#=================================================
+# SEND README TO ADMIN
+#=================================================
+
+message="
+Domain: $domain
+Path  : $path_url
+Config: $final_path/config.ini
+
+Please remember the default behavior of YunoHost when installing a new app is: everyone has access to the app.
+This may be an issue for Kresus as it is a personnal tool. Please remember to edit access rights in the YunoHost web administration panel or using command line interface.
+
+Note about config.ini: this package will regenerate the config file on upgrade.
+If you changed it manually and upgrade Kresus, you'll find a backup in $final_path.
+
+Are you facing an issue, want to improve this app or say thank you?
+Please open a new issue in this project: https://github.com/YunoHost-Apps/kresus_ynh
+"
+ynh_send_readme_to_admin "$message"
