@@ -169,9 +169,9 @@ chown -R root:root "$final_path"
 chown -R "$app":"$app" "$final_path/data/"
 chmod -R 750 "$final_path/data/"
 
-# Set permissions to config file
+# Set permissions to config files
 chown "$app" "$final_path/config.ini"
-chmod 600 "$final_path/config.ini"
+chmod 600 "$final_path/config.ini" "$final_path/data/weboob-data/backends"
 
 #=================================================
 # RELOAD NGINX
