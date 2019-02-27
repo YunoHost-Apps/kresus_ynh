@@ -14,7 +14,7 @@
 		setup_nourl=0
 		setup_private=1
 		setup_public=0
-		upgrade=1
+		upgrade=1 from_commit=c455d5def074eb4012e9c1d07e8e2abba38a3aa9
 		backup_restore=1
 		multi_instance=1
 		incorrect_path=1
@@ -36,3 +36,7 @@
 ;;; Options
 Email=jean-baptiste@holcroft.fr
 Notification=all
+;;; Upgrade options
+	; commit=c455d5def074eb4012e9c1d07e8e2abba38a3aa9
+		name=Upgrade from 0.13
+manifest_arg=domain=DOMAIN&path=/
