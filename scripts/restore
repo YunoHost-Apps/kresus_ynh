@@ -35,9 +35,9 @@ final_path=$(ynh_app_setting_get "$app" final_path)
 # CHECK IF THE APP CAN BE RESTORED
 #=================================================
 
-ynh_webpath_available $domain $path_url \
+ynh_webpath_available "$domain" "$path_url" \
 	|| ynh_die "Path not available: ${domain}${path_url}"
-test ! -d $final_path \
+test ! -d "$final_path" \
 	|| ynh_die "There is already a directory: $final_path "
 
 #=================================================
@@ -66,7 +66,7 @@ ynh_system_user_create "$app"
 #=================================================
 
 # Restore permissions on app files
-chown -R $app: $final_path
+chown -R "$app": "$final_path"
 chmod 600 "$final_path/config.ini"
 
 #=================================================
@@ -90,13 +90,13 @@ ynh_install_nodejs 8
 #=================================================
 
 ynh_restore_file "/etc/systemd/system/$app.service"
-systemctl enable $app.service
+systemctl enable "$app".service
 
 #=================================================
 # START HASTEBIN
 #=================================================
 
-systemctl start $app
+systemctl start "$app"
 
 #=================================================
 # GENERIC FINALIZATION
