@@ -18,24 +18,30 @@ ynh_abort_if_errors
 
 app=$YNH_APP_INSTANCE_NAME
 
-domain=$(ynh_app_setting_get $app domain)
-path_url=$(ynh_app_setting_get $app path)
-final_path=$(ynh_app_setting_get $app final_path)
-port=$(ynh_app_setting_get $app port)
+domain=$(ynh_app_setting_get "$app" domain)
+path_url=$(ynh_app_setting_get "$app" path)
+final_path=$(ynh_app_setting_get "$app" final_path)
+port=$(ynh_app_setting_get "$app" port)
+salt=$(ynh_app_setting_get "$app" salt)
 
 #=================================================
 # ENSURE DOWNWARD COMPATIBILITY
 #=================================================
 
 # If final_path doesn't exist, create it
-if [ -z $final_path ]; then
+if [ -z "$final_path" ]; then
 	final_path=/var/www/$app
-	ynh_app_setting_set $app final_path $final_path
+	ynh_app_setting_set "$app" final_path "$final_path"
 fi
 
-if [ -z "/home/ynh$app" ]; then
+if [ -d "/home/ynh$app" ]; then
 	mv "/home/ynh$app/data" "$final_path/data"
 	ynh_secure_remove "/home/ynh$app"
+fi
+
+if [ -z "$salt" ]; then
+	salt=$(ynh_string_random 40)
+	ynh_app_setting_set "$app" salt "$salt"
 fi
 
 #=================================================
@@ -57,7 +63,7 @@ ynh_abort_if_errors
 #=================================================
 
 # Normalize the URL path syntax
-path_url=$(ynh_normalize_url_path $path_url)
+path_url=$(ynh_normalize_url_path "$path_url")
 
 #=================================================
 # STANDARD UPGRADE STEPS
@@ -126,7 +132,7 @@ virtualenv --system-site-packages "${final_path}/venv"
 ynh_use_nodejs
 (
 	cd "$final_path"
-	chown -R $app: "$final_path"
+	chown -R "$app": "$final_path"
 	npm install --production --unsafe-perm
 )
 
@@ -141,6 +147,7 @@ cp ../conf/config.ini "$final_path/config.ini"
 ynh_replace_string "__PORT__"          "$port"       "$final_path/config.ini"
 ynh_replace_string "__PATH__"          "$path_url"   "$final_path/config.ini"
 ynh_replace_string "__FINALPATH__"     "$final_path" "$final_path/config.ini"
+ynh_replace_string "__SALT__"          "$salt"       "$final_path/config.ini"
 
 # Calculate and store the config file checksum into the app settings
 ynh_store_file_checksum "$final_path/config.ini"
@@ -171,7 +178,12 @@ chmod -R 750 "$final_path/data/"
 
 # Set permissions to config files
 chown "$app" "$final_path/config.ini"
-chmod 600 "$final_path/config.ini" "$final_path/data/weboob-data/backends"
+chmod 600 "$final_path/config.ini"
+
+if [ -f "$final_path/data/weboob-data/backends" ]
+then
+	chmod 600 "$final_path/data/weboob-data/backends"
+fi
 
 #=================================================
 # RELOAD NGINX

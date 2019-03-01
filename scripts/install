@@ -24,6 +24,7 @@ ynh_abort_if_errors
 domain=$YNH_APP_ARG_DOMAIN
 path_url=$YNH_APP_ARG_PATH
 port=$(ynh_find_port 9876)
+salt=$(ynh_string_random 40)
 
 app=$YNH_APP_INSTANCE_NAME
 
@@ -49,6 +50,7 @@ ynh_webpath_register "$app" "$domain" "$path_url"
 ynh_app_setting_set "$app" domain "$domain"
 ynh_app_setting_set "$app" path "$path_url"
 ynh_app_setting_set "$app" port "$port"
+ynh_app_setting_set "$app" salt "$salt"
 
 #=================================================
 # STANDARD MODIFICATIONS
@@ -119,7 +121,7 @@ virtualenv --system-site-packages "${final_path}/venv"
 ynh_use_nodejs
 (
 	cd "$final_path"
-	chown -R $app: "$final_path"
+	chown -R "$app": "$final_path"
 	npm install --production --unsafe-perm
 )
 
@@ -132,6 +134,8 @@ cp ../conf/config.ini "$final_path/config.ini"
 ynh_replace_string "__PORT__"          "$port"       "$final_path/config.ini"
 ynh_replace_string "__PATH__"          "$path_url"   "$final_path/config.ini"
 ynh_replace_string "__FINALPATH__"     "$final_path" "$final_path/config.ini"
+ynh_replace_string "__SALT__"          "$salt"       "$final_path/config.ini"
+
 
 # Calculate and store the config file checksum into the app settings
 ynh_store_file_checksum "$final_path/config.ini"
