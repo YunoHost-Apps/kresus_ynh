@@ -23,8 +23,6 @@ ynh_abort_if_errors
 # Retrieve arguments
 domain=$YNH_APP_ARG_DOMAIN
 path_url=$YNH_APP_ARG_PATH
-port=$(ynh_find_port 9876)
-salt=$(ynh_string_random 40)
 
 app=$YNH_APP_INSTANCE_NAME
 
@@ -49,6 +47,14 @@ ynh_webpath_register "$app" "$domain" "$path_url"
 
 ynh_app_setting_set "$app" domain "$domain"
 ynh_app_setting_set "$app" path "$path_url"
+
+#=================================================
+# DEFAULT SETTINGS
+#=================================================
+
+port=$(ynh_find_port 9876)
+salt=$(ynh_string_random 40)
+
 ynh_app_setting_set "$app" port "$port"
 ynh_app_setting_set "$app" salt "$salt"
 
