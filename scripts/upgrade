@@ -115,6 +115,7 @@ ynh_install_nodejs 8
 # Install weboob with pip
 #=================================================
 
+ynh_secure_remove "${final_path}/venv"
 virtualenv --system-site-packages "${final_path}/venv"
 (
 	set +o nounset
