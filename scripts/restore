@@ -71,8 +71,7 @@ chmod 600 "$final_path/config.ini"
 #=================================================
 
 # Define and install dependencies
-ynh_install_app_dependencies dh-autoreconf \
-	python-pip python-dev python-lxml python-imaging python-virtualenv
+ynh_install_app_dependencies $pkg_dependencies
 
 #=================================================
 # INSTALL NODEJS

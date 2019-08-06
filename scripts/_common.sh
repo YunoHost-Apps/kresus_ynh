@@ -1,5 +1,7 @@
 #!/bin/bash
 
+pkg_dependencies="dh-autoreconf	python-pip python-dev python-lxml python-imaging virtualenv"
+
 # INFOS
 # n (Node version management) utilise la variable PATH pour stocker le path de la version de node à utiliser.
 # C'est ainsi qu'il change de version

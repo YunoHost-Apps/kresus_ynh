@@ -64,8 +64,7 @@ ynh_app_setting_set "$app" salt "$salt"
 # INSTALL DEPENDENCIES
 #=================================================
 
-ynh_install_app_dependencies dh-autoreconf \
-	python-pip python-dev python-lxml python-imaging python-virtualenv
+ynh_install_app_dependencies $pkg_dependencies
 
 #=================================================
 # DOWNLOAD, CHECK AND UNPACK SOURCE
