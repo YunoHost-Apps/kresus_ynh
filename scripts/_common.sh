@@ -1,6 +1,6 @@
 #!/bin/bash
 
-pkg_dependencies="dh-autoreconf	python-pip python-dev python-lxml python-imaging virtualenv"
+pkg_dependencies="dh-autoreconf	python3-pip python3-dev python3-lxml python3-pillow virtualenv"
 
 # Send an email to inform the administrator
 #
