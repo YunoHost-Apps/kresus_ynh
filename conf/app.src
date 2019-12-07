@@ -1,5 +1,5 @@
-SOURCE_URL=https://framagit.org/kresusapp/kresus/-/archive/0.15.1/kresus-0.15.1.tar.bz2
-SOURCE_SUM=ab4c6461a3844114ec2c79feebaebd428dadfa527d7e4793f29eee961c7e30db
+SOURCE_URL=https://framagit.org/kresusapp/kresus/-/archive/0.15.2/kresus-0.15.2.tar.bz2
+SOURCE_SUM=420ed94313e3343f47d84095bd9adade166cc1e5d83f211d39cb2dd254bb63a6
 SOURCE_SUM_PRG=sha256sum
 SOURCE_FORMAT=tar.bz2
 SOURCE_IN_SUBDIR=true

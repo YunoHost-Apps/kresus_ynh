@@ -140,6 +140,8 @@ ynh_replace_string "__PORT__"          "$port"       "$final_path/config.ini"
 ynh_replace_string "__PATH__"          "$path_url"   "$final_path/config.ini"
 ynh_replace_string "__FINALPATH__"     "$final_path" "$final_path/config.ini"
 ynh_replace_string "__SALT__"          "$salt"       "$final_path/config.ini"
+ynh_replace_string "__APP__"           "$app"        "$final_path/config.ini"
+ynh_replace_string "__DOMAIN__"        "$domain"     "$final_path/config.ini"
 
 
 # Calculate and store the config file checksum into the app settings
