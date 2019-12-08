@@ -8,7 +8,7 @@ If you don't have YunoHost, please see [here](https://yunohost.org/#/install) to
 
 ## Overview
 
-Kresus is an open-source libre self-hosted personal finance manager. It allows you to safely track your banking history, check your overall balance and know exactly on what you are spending money with the use of tags!
+Kresus is an open-source libre self-hosted personal finance manager. It allows you to safely track your banking history, check your overall balance and know exactly how you are spending money using categories!
 
 **Shipped version:** 0.14.0
 
@@ -18,7 +18,7 @@ Kresus is an open-source libre self-hosted personal finance manager. It allows y
 
 ## Demo
 
-* [Official demo](https://kresus.org/en/demo.html)
+* [Official demo](https://kresus.org/en/demo.html) ⚠️ Don't set up a connection to your bank accounts, or everybody would be able to look at your private bank information!
 
 ## Configuration
 
