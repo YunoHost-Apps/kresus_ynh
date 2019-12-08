@@ -71,8 +71,7 @@ path_url=$(ynh_normalize_url_path "$path_url")
 # INSTALL DEPENDENCIES
 #=================================================
 
-ynh_install_app_dependencies dh-autoreconf \
-	python-pip python-dev python-lxml python-imaging python-virtualenv
+ynh_install_app_dependencies $pkg_dependencies
 
 #=================================================
 # DOWNLOAD, CHECK AND UNPACK SOURCE
@@ -109,20 +108,21 @@ ynh_system_user_create "$app"
 #=================================================
 
 # install nodejs
-ynh_install_nodejs 8
+ynh_install_nodejs 10
 
 #=================================================
 # Install weboob with pip
 #=================================================
 
-virtualenv --system-site-packages "${final_path}/venv"
+ynh_secure_remove "${final_path}/venv"
+virtualenv --python=python3 --system-site-packages "${final_path}/venv"
 (
 	set +o nounset
 	source "${final_path}/venv/bin/activate"
 	set -o nounset
 
 	pip install --upgrade pip
-	pip install weboob html2text simplejson BeautifulSoup PyExecJS
+	pip install weboob html2text simplejson BeautifulSoup4 PyExecJS
 )
 
 #=================================================
@@ -156,7 +156,7 @@ ynh_store_file_checksum "$final_path/config.ini"
 # SETUP SYSTEMD
 #=================================================
 
-ynh_replace_string "__NODEJS__"   "$nodejs_use_version"       ../conf/systemd.service
+ynh_replace_string "__NODEJS__"   "$nodejs_path"              ../conf/systemd.service
 ynh_replace_string "__ENV_PATH__" "$PATH"                     ../conf/systemd.service
 ynh_replace_string "__NODEPATH__" "$(dirname "$nodejs_path")" ../conf/systemd.service
 

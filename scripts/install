@@ -23,8 +23,6 @@ ynh_abort_if_errors
 # Retrieve arguments
 domain=$YNH_APP_ARG_DOMAIN
 path_url=$YNH_APP_ARG_PATH
-port=$(ynh_find_port 9876)
-salt=$(ynh_string_random 40)
 
 app=$YNH_APP_INSTANCE_NAME
 
@@ -49,6 +47,14 @@ ynh_webpath_register "$app" "$domain" "$path_url"
 
 ynh_app_setting_set "$app" domain "$domain"
 ynh_app_setting_set "$app" path "$path_url"
+
+#=================================================
+# DEFAULT SETTINGS
+#=================================================
+
+port=$(ynh_find_port 9876)
+salt=$(ynh_string_random 40)
+
 ynh_app_setting_set "$app" port "$port"
 ynh_app_setting_set "$app" salt "$salt"
 
@@ -58,8 +64,7 @@ ynh_app_setting_set "$app" salt "$salt"
 # INSTALL DEPENDENCIES
 #=================================================
 
-ynh_install_app_dependencies dh-autoreconf \
-	python-pip python-dev python-lxml python-imaging python-virtualenv
+ynh_install_app_dependencies $pkg_dependencies
 
 #=================================================
 # DOWNLOAD, CHECK AND UNPACK SOURCE
@@ -98,20 +103,20 @@ ynh_system_user_create "$app"
 #=================================================
 
 # install nodejs
-ynh_install_nodejs 8
+ynh_install_nodejs 10
 
 #=================================================
 # Install weboob with pip
 #=================================================
 
-virtualenv --system-site-packages "${final_path}/venv"
+virtualenv --python=python3 --system-site-packages "${final_path}/venv"
 (
 	set +o nounset
 	source "${final_path}/venv/bin/activate"
 	set -o nounset
 
 	pip install --upgrade pip
-	pip install weboob html2text simplejson BeautifulSoup PyExecJS
+	pip install weboob html2text simplejson BeautifulSoup4 PyExecJS
 )
 
 #=================================================
@@ -135,6 +140,8 @@ ynh_replace_string "__PORT__"          "$port"       "$final_path/config.ini"
 ynh_replace_string "__PATH__"          "$path_url"   "$final_path/config.ini"
 ynh_replace_string "__FINALPATH__"     "$final_path" "$final_path/config.ini"
 ynh_replace_string "__SALT__"          "$salt"       "$final_path/config.ini"
+ynh_replace_string "__APP__"           "$app"        "$final_path/config.ini"
+ynh_replace_string "__DOMAIN__"        "$domain"     "$final_path/config.ini"
 
 
 # Calculate and store the config file checksum into the app settings
@@ -144,7 +151,7 @@ ynh_store_file_checksum "$final_path/config.ini"
 # SETUP SYSTEMD
 #=================================================
 
-ynh_replace_string "__NODEJS__"   "$nodejs_use_version"       ../conf/systemd.service
+ynh_replace_string "__NODEJS__"   "$nodejs_path"              ../conf/systemd.service
 ynh_replace_string "__ENV_PATH__" "$PATH"                     ../conf/systemd.service
 ynh_replace_string "__NODEPATH__" "$(dirname "$nodejs_path")" ../conf/systemd.service
 

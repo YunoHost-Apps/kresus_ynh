@@ -6,7 +6,7 @@ After=syslog.target network.target
 Type=simple
 User=__APP__
 Group=__APP__
-ExecStartPre=__NODEJS__
+#ExecStartPre=__NODEJS__
 WorkingDirectory=__FINALPATH__
 Environment="PATH=__ENV_PATH__"
 Environment=NODE_ENV=production
@@ -20,7 +20,13 @@ ProtectHome=true
 ProtectSystem=strict
 ProtectControlGroups=yes
 ProtectKernelModules=yes
-ReadWritePaths=__FINALPATH__/config.ini __FINALPATH__/data/
+# to allow this systemd service to use sendmail.
+# references:
+#  https://bugs.archlinux.org/task/57721
+#  https://linux.m2osw.com/snapwebsites-postfixpostdrop18189-warning-mailqueueenter-create-file-maildrop25937318189-permission
+# Future wait for this ticket to be resolved: https://github.com/YunoHost/issues/issues/947
+SupplementaryGroups=postdrop
+ReadWritePaths=__FINALPATH__/config.ini __FINALPATH__/data/ /var/spool/postfix/maildrop/
 
 StandardOutput=syslog
 StandardError=syslog

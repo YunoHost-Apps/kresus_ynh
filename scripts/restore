@@ -6,12 +6,7 @@
 # IMPORT GENERIC HELPERS
 #=================================================
 
-if [ ! -e _common.sh ]; then
-	# Get the _common.sh file if it's not in the current directory
-	cp ../settings/scripts/_common.sh ./_common.sh
-	chmod a+rx _common.sh
-fi
-source _common.sh
+source ../settings/scripts/_common.sh
 source /usr/share/yunohost/helpers
 
 #=================================================
@@ -76,14 +71,13 @@ chmod 600 "$final_path/config.ini"
 #=================================================
 
 # Define and install dependencies
-ynh_install_app_dependencies dh-autoreconf \
-	python-pip python-dev python-lxml python-imaging python-virtualenv
+ynh_install_app_dependencies $pkg_dependencies
 
 #=================================================
 # INSTALL NODEJS
 #=================================================
 
-ynh_install_nodejs 8
+ynh_install_nodejs 10
 
 #=================================================
 # RESTORE SYSTEMD

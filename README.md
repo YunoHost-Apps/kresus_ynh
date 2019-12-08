@@ -3,11 +3,44 @@
 [![Integration level](https://dash.yunohost.org/integration/kresus.svg)](https://dash.yunohost.org/appci/app/kresus)
 [![Install Kresus with YunoHost](https://install-app.yunohost.org/install-with-yunohost.png)](https://install-app.yunohost.org/?app=kresus)
 
-Kresus is an open-source libre self-hosted personal finance manager. It allows you to safely track your banking history, check your overall balance and know exactly on what you are spending money with the use of tags!
+> *This package allows you to install Kresus quickly and simply on a YunoHost server.  
+If you don't have YunoHost, please see [here](https://yunohost.org/#/install) to know how to install and enjoy it.*
 
-**Shipped version:** 0.14.0
+## Overview
 
-# State of this package
+Kresus is an open-source libre self-hosted personal finance manager. It allows you to safely track your banking history, check your overall balance and know exactly how you are spending money using categories!
+
+**Shipped version:** 0.15.2
+
+## Screenshots
+
+![](https://kresus.org/images/pages/view-all-accounts.png)
+
+## Demo
+
+* [Official demo](https://kresus.org/en/demo.html) ⚠️ Don't set up a connection to your bank accounts, or everybody would be able to look at your private bank information!
+
+## Configuration
+
+## Documentation
+
+* Official documentation: https://kresus.org/en/doc.html
+
+## YunoHost specific features
+
+### Supported architectures
+
+* x86-64b - [![Build Status](https://ci-apps.yunohost.org/ci/logs/kresus%20%28Apps%29.svg)](https://ci-apps.yunohost.org/ci/apps/kresus/)
+* ARMv8-A - [![Build Status](https://ci-apps-arm.yunohost.org/ci/logs/kresus%20%28Apps%29.svg)](https://ci-apps-arm.yunohost.org/ci/apps/kresus/)
+* Jessie x86-64b - [![Build Status](https://ci-stretch.nohost.me/ci/logs/kresus%20%28Apps%29.svg)](https://ci-stretch.nohost.me/ci/apps/kresus/)
+
+## Limitations
+
+* By default, all users have access to the accounts. Need to manually select authorised user through YunoHost Administration Panel.
+
+# Additional information
+
+## Roadmap
 
 * works fine:
 
