@@ -15,7 +15,7 @@
     "requirements": {
         "yunohost": ">= 3.6.0"
     },
-    "version": "0.15.2~ynh3",
+    "version": "0.15.2~ynh4",
     "multi_instance": true,
     "services": [
         "nginx"

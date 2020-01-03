@@ -122,7 +122,7 @@ virtualenv --python=python3 --system-site-packages "${final_path}/venv"
 	set -o nounset
 
 	pip install --upgrade pip
-	pip install weboob html2text simplejson BeautifulSoup4 PyExecJS
+	pip install weboob html2text simplejson BeautifulSoup4 PyExecJS pdfminer
 )
 
 #=================================================
