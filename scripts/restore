@@ -7,6 +7,7 @@
 #=================================================
 
 source ../settings/scripts/_common.sh
+source ../settings/scripts/_ynh_detect_arch
 source /usr/share/yunohost/helpers
 
 #=================================================
@@ -22,13 +23,25 @@ ynh_abort_if_errors
 
 app=$YNH_APP_INSTANCE_NAME
 
+db_name="$app"
+db_user="$app"
+
 domain=$(ynh_app_setting_get "$app" domain)
 path_url=$(ynh_app_setting_get "$app" path)
 final_path=$(ynh_app_setting_get "$app" final_path)
+salt=$(ynh_app_setting_get "$app" salt)
+db_pwd=$(ynh_app_setting_get "$app" db_pwd)
 
 #=================================================
 # CHECK IF THE APP CAN BE RESTORED
 #=================================================
+
+architecture=$(ynh_detect_arch)
+# Check machine architecture (in particular, we don't support ARM and 32bit machines)
+if [ $architecture == "i386" ]
+then
+	ynh_die --message="Sorry, because of nodejs framework, this app can't be installed on i386 (32 bits) machine."
+fi
 
 ynh_webpath_available "$domain" "$path_url" \
 	|| ynh_die "Path not available: ${domain}${path_url}"
@@ -77,7 +90,17 @@ ynh_install_app_dependencies $pkg_dependencies
 # INSTALL NODEJS
 #=================================================
 
-ynh_install_nodejs 10
+ynh_install_nodejs 12
+
+#=================================================
+# RESTORE THE POSTGRESQL DATABASE
+#=================================================
+
+ynh_psql_test_if_first_run
+ynh_print_OFF
+ynh_psql_setup_db "$db_user" "$db_name" "$db_pwd"
+ynh_print_ON
+ynh_psql_execute_file_as_root --file="${YNH_CWD}/dump.sql" --database="$db_name"
 
 #=================================================
 # RESTORE SYSTEMD
@@ -87,7 +110,7 @@ ynh_restore_file "/etc/systemd/system/$app.service"
 systemctl enable "$app".service
 
 #=================================================
-# START HASTEBIN
+# START KRESUS
 #=================================================
 
 systemctl start "$app"

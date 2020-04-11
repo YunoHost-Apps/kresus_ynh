@@ -7,6 +7,7 @@
 #=================================================
 
 source _common.sh
+source _ynh_detect_arch
 source /usr/share/yunohost/helpers
 
 #=================================================
@@ -30,6 +31,13 @@ app=$YNH_APP_INSTANCE_NAME
 # CHECK IF THE APP CAN BE INSTALLED WITH THESE ARGS
 #=================================================
 
+architecture=$(ynh_detect_arch)
+# Check machine architecture (in particular, we don't support ARM and 32bit machines)
+if [ $architecture == "i386" ]
+then
+	ynh_die --message="Sorry, because of nodejs framework, this app can't be installed on i386 (32 bits) machine."
+fi
+
 final_path="/var/www/$app"
 test ! -e "$final_path" || ynh_die "This path already contains a folder"
 
@@ -52,11 +60,17 @@ ynh_app_setting_set "$app" path "$path_url"
 # DEFAULT SETTINGS
 #=================================================
 
+db_name="$app"
+db_user="$app"
 port=$(ynh_find_port 9876)
 salt=$(ynh_string_random 40)
+db_pwd=$(ynh_string_random 40)
 
 ynh_app_setting_set "$app" port "$port"
 ynh_app_setting_set "$app" salt "$salt"
+ynh_print_OFF
+ynh_app_setting_set "$app" db_pwd "$db_pwd"
+ynh_print_ON
 
 #=================================================
 # STANDARD MODIFICATIONS
@@ -103,7 +117,7 @@ ynh_system_user_create "$app"
 #=================================================
 
 # install nodejs
-ynh_install_nodejs 10
+ynh_install_nodejs 12
 
 #=================================================
 # Install weboob with pip
@@ -131,17 +145,27 @@ ynh_use_nodejs
 )
 
 #=================================================
-# CONFIGURE HASTE
+# Setup Kresus postgresql database
+#=================================================
+
+ynh_psql_test_if_first_run
+ynh_psql_setup_db "$db_user" "$db_name" "$db_pwd"
+
+#=================================================
+# CONFIGURE KRESUS
 #=================================================
 
 cp ../conf/config.ini "$final_path/config.ini"
 
-ynh_replace_string "__PORT__"          "$port"       "$final_path/config.ini"
-ynh_replace_string "__PATH__"          "$path_url"   "$final_path/config.ini"
-ynh_replace_string "__FINALPATH__"     "$final_path" "$final_path/config.ini"
-ynh_replace_string "__SALT__"          "$salt"       "$final_path/config.ini"
-ynh_replace_string "__APP__"           "$app"        "$final_path/config.ini"
-ynh_replace_string "__DOMAIN__"        "$domain"     "$final_path/config.ini"
+ynh_replace_string "__PORT__"          "$port"               "$final_path/config.ini"
+ynh_replace_string "__PATH__"          "$path_url"           "$final_path/config.ini"
+ynh_replace_string "__FINALPATH__"     "$final_path"         "$final_path/config.ini"
+ynh_replace_string "__SALT__"          "$salt"               "$final_path/config.ini"
+ynh_replace_string "__APP__"           "$app"                "$final_path/config.ini"
+ynh_replace_string "__DOMAIN__"        "$domain"             "$final_path/config.ini"
+ynh_replace_string "__DB_NAME__"       "$db_user"            "$final_path/config.ini"
+ynh_replace_string "__DB_USER__"       "$db_name"            "$final_path/config.ini"
+ynh_replace_string "__DB_PASSWORD__"   "$db_pwd"             "$final_path/config.ini"
 
 
 # Calculate and store the config file checksum into the app settings
@@ -190,7 +214,7 @@ Path  : $path_url
 Config: $final_path/config.ini
 
 Please remember the default behavior of YunoHost when installing a new app is: everyone has access to the app.
-This may be an issue for Kresus as it is a personnal tool. Please remember to edit access rights in the YunoHost web administration panel or using command line interface.
+This may be an issue for Kresus as it is a personal tool. Please remember to edit access rights in the YunoHost web administration panel or using command line interface.
 
 Note about config.ini: this package will regenerate the config file on upgrade.
 If you changed it manually and upgrade Kresus, you'll find a backup in $final_path.

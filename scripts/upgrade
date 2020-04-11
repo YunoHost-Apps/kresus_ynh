@@ -18,11 +18,15 @@ ynh_abort_if_errors
 
 app=$YNH_APP_INSTANCE_NAME
 
+db_name="$app"
+db_user="$app"
+
 domain=$(ynh_app_setting_get "$app" domain)
 path_url=$(ynh_app_setting_get "$app" path)
 final_path=$(ynh_app_setting_get "$app" final_path)
 port=$(ynh_app_setting_get "$app" port)
 salt=$(ynh_app_setting_get "$app" salt)
+db_pwd=$(ynh_app_setting_get "$app" db_pwd)
 
 #=================================================
 # ENSURE DOWNWARD COMPATIBILITY
@@ -36,12 +40,22 @@ fi
 
 if [ -d "/home/ynh$app" ]; then
 	mv "/home/ynh$app/data" "$final_path/data"
-	ynh_secure_remove "/home/ynh$app"
+	ynh_secure_remove --file="/home/ynh$app"
 fi
 
 if [ -z "$salt" ]; then
 	salt=$(ynh_string_random 40)
 	ynh_app_setting_set "$app" salt "$salt"
+fi
+
+if [ -z "$db_pwd" ]; then
+	ynh_print_OFF
+	db_pwd=$(ynh_string_random 40)
+	ynh_app_setting_set "$app" db_pwd "$db_pwd"
+	ynh_print_ON
+
+	ynh_psql_test_if_first_run
+	ynh_psql_setup_db "$db_user" "$db_name" "$db_pwd"
 fi
 
 #=================================================
@@ -108,13 +122,13 @@ ynh_system_user_create "$app"
 #=================================================
 
 # install nodejs
-ynh_install_nodejs 10
+ynh_install_nodejs 12
 
 #=================================================
 # Install weboob with pip
 #=================================================
 
-ynh_secure_remove "${final_path}/venv"
+ynh_secure_remove --file="${final_path}/venv"
 virtualenv --python=python3 --system-site-packages "${final_path}/venv"
 (
 	set +o nounset
@@ -133,23 +147,31 @@ ynh_use_nodejs
 (
 	cd "$final_path"
 	chown -R "$app": "$final_path"
+
+	# In case of nodejs upgrade, remove the current node_modules to make sure there are no errors
+	# linked to modules compiled for the previous version.
+	ynh_secure_remove --file="$final_path/node_modules"
+
 	npm install --production --unsafe-perm
 )
 
 #=================================================
-# CONFIGURE HASTE
+# CONFIGURE KRESUS
 #=================================================
 
 ynh_backup_if_checksum_is_different "$final_path/config.ini"
 
 cp ../conf/config.ini "$final_path/config.ini"
 
-ynh_replace_string "__PORT__"          "$port"       "$final_path/config.ini"
-ynh_replace_string "__PATH__"          "$path_url"   "$final_path/config.ini"
-ynh_replace_string "__FINALPATH__"     "$final_path" "$final_path/config.ini"
-ynh_replace_string "__SALT__"          "$salt"       "$final_path/config.ini"
-ynh_replace_string "__APP__"           "$app"        "$final_path/config.ini"
-ynh_replace_string "__DOMAIN__"        "$domain"     "$final_path/config.ini"
+ynh_replace_string "__PORT__"          "$port"               "$final_path/config.ini"
+ynh_replace_string "__PATH__"          "$path_url"           "$final_path/config.ini"
+ynh_replace_string "__FINALPATH__"     "$final_path"         "$final_path/config.ini"
+ynh_replace_string "__SALT__"          "$salt"               "$final_path/config.ini"
+ynh_replace_string "__APP__"           "$app"                "$final_path/config.ini"
+ynh_replace_string "__DOMAIN__"        "$domain"             "$final_path/config.ini"
+ynh_replace_string "__DB_NAME__"       "$db_user"            "$final_path/config.ini"
+ynh_replace_string "__DB_USER__"       "$db_name"            "$final_path/config.ini"
+ynh_replace_string "__DB_PASSWORD__"   "$db_pwd"             "$final_path/config.ini"
 
 # Calculate and store the config file checksum into the app settings
 ynh_store_file_checksum "$final_path/config.ini"
@@ -206,7 +228,7 @@ Path  : $path_url
 Config: $final_path/config.ini
 
 Please remember the default behavior of YunoHost when installing a new app is: everyone has access to the app.
-This may be an issue for Kresus as it is a personnal tool. Please remember to edit access rights in the YunoHost web administration panel or using command line interface.
+This may be an issue for Kresus as it is a personal tool. Please remember to edit access rights in the YunoHost web administration panel or using command line interface.
 
 Note about config.ini: this package will regenerate the config file on upgrade.
 If you changed it manually and upgrade Kresus, you'll find a backup in $final_path.

@@ -15,7 +15,7 @@
     "requirements": {
         "yunohost": ">= 3.6.0"
     },
-    "version": "0.15.2~ynh4",
+    "version": "0.16.0~ynh1",
     "multi_instance": true,
     "services": [
         "nginx"
@@ -24,7 +24,7 @@
         "install" : [
             {
                 "name": "domain",
-		"type": "domain",
+                "type": "domain",
                 "ask": {
                     "en": "Choose a domain name for Kresus",
                     "fr": "Choisissez un nom de domaine pour Kresus"
@@ -33,7 +33,7 @@
             },
             {
                 "name": "path",
-		"type": "path",
+                "type": "path",
                 "ask": {
                     "en": "Choose a path for Kresus",
                     "fr": "Choisissez un chemin pour Kresus"
