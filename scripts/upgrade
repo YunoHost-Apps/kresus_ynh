@@ -26,7 +26,7 @@ path_url=$(ynh_app_setting_get "$app" path)
 final_path=$(ynh_app_setting_get "$app" final_path)
 port=$(ynh_app_setting_get "$app" port)
 salt=$(ynh_app_setting_get "$app" salt)
-db_pwd=$(ynh_app_setting_get "$app" db_pwd)
+db_pwd=$(ynh_app_setting_get "$app" psqlpwd)
 
 #=================================================
 # ENSURE DOWNWARD COMPATIBILITY
@@ -49,13 +49,9 @@ if [ -z "$salt" ]; then
 fi
 
 if [ -z "$db_pwd" ]; then
-	ynh_print_OFF
-	db_pwd=$(ynh_string_random 40)
-	ynh_app_setting_set "$app" db_pwd "$db_pwd"
-	ynh_print_ON
-
 	ynh_psql_test_if_first_run
-	ynh_psql_setup_db "$db_user" "$db_name" "$db_pwd"
+	ynh_psql_setup_db "$db_user" "$db_name"
+	db_pwd=$(ynh_app_setting_get "$app" psqlpwd)
 fi
 
 #=================================================
