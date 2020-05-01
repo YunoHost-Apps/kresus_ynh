@@ -25,6 +25,8 @@ app=$YNH_APP_INSTANCE_NAME
 final_path=$(ynh_app_setting_get "$app" final_path)
 domain=$(ynh_app_setting_get "$app" domain)
 
+db_name="$app"
+
 #=================================================
 # STANDARD BACKUP STEPS
 #=================================================
@@ -38,6 +40,12 @@ ynh_backup "$final_path"
 #=================================================
 
 ynh_backup "/etc/nginx/conf.d/$domain.d/$app.conf"
+
+#=================================================
+# BACKUP THE POSTGRESQL DATABASE
+#=================================================
+
+ynh_psql_dump_db --database="$db_name" > ${YNH_CWD}/dump.sql
 
 #=================================================
 # SPECIFIC BACKUP
