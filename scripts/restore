@@ -30,7 +30,7 @@ domain=$(ynh_app_setting_get "$app" domain)
 path_url=$(ynh_app_setting_get "$app" path)
 final_path=$(ynh_app_setting_get "$app" final_path)
 salt=$(ynh_app_setting_get "$app" salt)
-db_pwd=$(ynh_app_setting_get "$app" db_pwd)
+db_pwd=$(ynh_app_setting_get "$app" psqlpwd)
 
 #=================================================
 # CHECK IF THE APP CAN BE RESTORED

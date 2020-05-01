@@ -60,17 +60,11 @@ ynh_app_setting_set "$app" path "$path_url"
 # DEFAULT SETTINGS
 #=================================================
 
-db_name="$app"
-db_user="$app"
 port=$(ynh_find_port 9876)
 salt=$(ynh_string_random 40)
-db_pwd=$(ynh_string_random 40)
 
 ynh_app_setting_set "$app" port "$port"
 ynh_app_setting_set "$app" salt "$salt"
-ynh_print_OFF
-ynh_app_setting_set "$app" db_pwd "$db_pwd"
-ynh_print_ON
 
 #=================================================
 # STANDARD MODIFICATIONS
@@ -148,8 +142,12 @@ ynh_use_nodejs
 # Setup Kresus postgresql database
 #=================================================
 
+db_name="$app"
+db_user="$app"
+
 ynh_psql_test_if_first_run
-ynh_psql_setup_db "$db_user" "$db_name" "$db_pwd"
+ynh_psql_setup_db "$db_user" "$db_name"
+db_pwd=$(ynh_app_setting_get "$app" psqlpwd)
 
 #=================================================
 # CONFIGURE KRESUS
