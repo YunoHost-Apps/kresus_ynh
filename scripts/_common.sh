@@ -1,6 +1,6 @@
 #!/bin/bash
 
-pkg_dependencies="dh-autoreconf	python3-pip python3-dev python3-lxml python3-pillow virtualenv"
+pkg_dependencies="dh-autoreconf	python3-pip python3-dev python3-lxml python3-pillow virtualenv postgresql"
 
 # Send an email to inform the administrator
 #
@@ -49,7 +49,7 @@ $app_message
 ---
 Automatic diagnosis data from YunoHost
 
-$(yunohost tools diagnosis | grep -B 100 "services:" | sed '/services:/d')"
+$(yunohost diagnosis show | grep -B 100 "services:" | sed '/services:/d')"
 
 	# Define binary to use for mail command
 	if [ -e /usr/bin/bsd-mailx ]

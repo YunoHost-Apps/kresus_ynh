@@ -18,6 +18,8 @@ app=$YNH_APP_INSTANCE_NAME
 domain=$(ynh_app_setting_get "$app" domain)
 port=$(ynh_app_setting_get "$app" port)
 final_path=$(ynh_app_setting_get "$app" final_path)
+db_name="$app"
+db_user="$app"
 
 #=================================================
 # STANDARD REMOVE
@@ -27,6 +29,13 @@ final_path=$(ynh_app_setting_get "$app" final_path)
 
 # Remove the dedicated systemd config
 ynh_remove_systemd_config
+
+#=================================================
+# REMOVE THE POSTGRESQL DATABASE
+#=================================================
+
+# Remove a database if it exists, along with the associated user
+ynh_psql_remove_db --db_user="$db_user" --db_name="$db_name"
 
 #=================================================
 # REMOVE DEPENDENCIES
@@ -41,7 +50,7 @@ ynh_remove_nodejs
 #=================================================
 
 # Remove the app directory securely
-ynh_secure_remove "$final_path"
+ynh_secure_remove --file="$final_path"
 
 #=================================================
 # REMOVE NGINX CONFIGURATION
