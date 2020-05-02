@@ -48,12 +48,6 @@ if [ -z "$salt" ]; then
 	ynh_app_setting_set "$app" salt "$salt"
 fi
 
-if [ -z "$db_pwd" ]; then
-	ynh_psql_test_if_first_run
-	ynh_psql_setup_db "$db_user" "$db_name"
-	db_pwd=$(ynh_app_setting_get "$app" psqlpwd)
-fi
-
 #=================================================
 # BACKUP BEFORE UPGRADE THEN ACTIVE TRAP
 #=================================================
@@ -82,6 +76,14 @@ path_url=$(ynh_normalize_url_path "$path_url")
 #=================================================
 
 ynh_install_app_dependencies $pkg_dependencies
+
+
+# Now that postgresql is installed, check the db exists and the user is set up
+if [ -z "$db_pwd" ]; then
+	ynh_psql_test_if_first_run
+	ynh_psql_setup_db "$db_user" "$db_name"
+	db_pwd=$(ynh_app_setting_get "$app" psqlpwd)
+fi
 
 #=================================================
 # DOWNLOAD, CHECK AND UNPACK SOURCE
