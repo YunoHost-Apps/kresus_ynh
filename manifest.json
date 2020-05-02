@@ -9,9 +9,15 @@
     "url": "https://framagit.org/kresusapp/kresus",
     "license": "AGPL-3.0-only",
     "maintainer": {
-        "name": "Jean-Baptiste Holcroft",
-        "email": "jean-baptiste@holcroft.fr"
+        "name": "Nicolas <nicofrand> Frandeboeuf",
+        "email": "mail@nicofrand.eu"
     },
+    "previous_maintainers": [
+        {
+            "name": "Jean-Baptiste Holcroft",
+            "email": "jean-baptiste@holcroft.fr"
+        }
+    ],
     "requirements": {
         "yunohost": ">= 3.6.0"
     },
