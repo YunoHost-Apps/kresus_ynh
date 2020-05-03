@@ -93,7 +93,7 @@ fi
 #=================================================
 
 # Download, check integrity, uncompress and patch the source from app.src
-ynh_script_progression --message="Dowloading app from sources"
+ynh_script_progression --message="Downloading app from sources"
 ynh_setup_source "$final_path"
 mkdir -p "$final_path/data"
 
