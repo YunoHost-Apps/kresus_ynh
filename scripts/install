@@ -83,7 +83,7 @@ ynh_install_app_dependencies $pkg_dependencies
 ynh_app_setting_set "$app" final_path "$final_path"
 
 # Download, check integrity, uncompress and patch the source from app.src
-ynh_script_progression --message="Dowloading app from sources"
+ynh_script_progression --message="Downloading app from sources"
 ynh_setup_source "$final_path"
 mkdir "$final_path/data"
 
