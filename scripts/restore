@@ -60,6 +60,7 @@ ynh_restore_file "/etc/nginx/conf.d/$domain.d/$app.conf"
 # RESTORE THE APP MAIN DIR
 #=================================================
 
+ynh_script_progression --message="Restoring files"
 ynh_restore_file "$final_path"
 
 #=================================================
@@ -67,6 +68,7 @@ ynh_restore_file "$final_path"
 #=================================================
 
 # Create the dedicated user (if not existing)
+ynh_script_progression --message="Creating system user"
 ynh_system_user_create "$app"
 
 #=================================================
@@ -83,19 +85,21 @@ chmod 600 "$final_path/config.ini"
 # REINSTALL DEPENDENCIES
 #=================================================
 
-# Define and install dependencies
+ynh_script_progression --message="Installing app dependencies"
 ynh_install_app_dependencies $pkg_dependencies
 
 #=================================================
 # INSTALL NODEJS
 #=================================================
 
+ynh_script_progression --message="Installing nodejs"
 ynh_install_nodejs 12
 
 #=================================================
 # RESTORE THE POSTGRESQL DATABASE
 #=================================================
 
+ynh_script_progression --message="Restoring database"
 ynh_psql_test_if_first_run
 ynh_print_OFF
 ynh_psql_setup_db "$db_user" "$db_name" "$db_pwd"
@@ -113,6 +117,7 @@ systemctl enable "$app".service
 # START KRESUS
 #=================================================
 
+ynh_script_progression --message="Starting application"
 systemctl start "$app"
 
 #=================================================
@@ -121,4 +126,7 @@ systemctl start "$app"
 # RELOAD NGINX AND PHP-FPM
 #=================================================
 
+ynh_script_progression --message="Reloading nginx"
 systemctl reload nginx
+
+ynh_script_progression --message="Restoration of $app completed" --last

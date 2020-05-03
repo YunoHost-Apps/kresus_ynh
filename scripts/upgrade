@@ -52,6 +52,7 @@ fi
 # BACKUP BEFORE UPGRADE THEN ACTIVE TRAP
 #=================================================
 
+ynh_script_progression --message="Backing up the app"
 # Backup the current version of the app
 ynh_backup_before_upgrade
 ynh_clean_setup () {
@@ -75,10 +76,12 @@ path_url=$(ynh_normalize_url_path "$path_url")
 # INSTALL DEPENDENCIES
 #=================================================
 
+ynh_script_progression --message="Installing app dependencies"
 ynh_install_app_dependencies $pkg_dependencies
 
 
 # Now that postgresql is installed, check the db exists and the user is set up
+ynh_script_progression --message="Setting up database"
 if [ -z "$db_pwd" ]; then
 	ynh_psql_test_if_first_run
 	ynh_psql_setup_db "$db_user" "$db_name"
@@ -90,6 +93,7 @@ fi
 #=================================================
 
 # Download, check integrity, uncompress and patch the source from app.src
+ynh_script_progression --message="Dowloading app from sources"
 ynh_setup_source "$final_path"
 mkdir -p "$final_path/data"
 
@@ -109,7 +113,7 @@ ynh_store_file_checksum "/etc/nginx/conf.d/$domain.d/$app.conf"
 # CREATE DEDICATED USER
 #=================================================
 
-# Create a system user
+ynh_script_progression --message="Creating system user"
 ynh_system_user_create "$app"
 
 
@@ -119,13 +123,14 @@ ynh_system_user_create "$app"
 # Install nodesjs
 #=================================================
 
-# install nodejs
+ynh_script_progression --message="Installing nodejs"
 ynh_install_nodejs 12
 
 #=================================================
 # Install weboob with pip
 #=================================================
 
+ynh_script_progression --message="Installing weboob"
 ynh_secure_remove --file="${final_path}/venv"
 virtualenv --python=python3 --system-site-packages "${final_path}/venv"
 (
@@ -141,6 +146,7 @@ virtualenv --python=python3 --system-site-packages "${final_path}/venv"
 # Install Kresus with npm
 #=================================================
 
+ynh_script_progression --message="Installing app"
 ynh_use_nodejs
 (
 	cd "$final_path"
@@ -183,6 +189,7 @@ ynh_replace_string "__ENV_PATH__" "$PATH"                     ../conf/systemd.se
 ynh_replace_string "__NODEPATH__" "$(dirname "$nodejs_path")" ../conf/systemd.service
 
 # Create a dedicated systemd config
+ynh_script_progression --message="Creating systemd configuration"
 ynh_add_systemd_config
 
 #=================================================
@@ -211,6 +218,7 @@ fi
 # RELOAD NGINX
 #=================================================
 
+ynh_script_progression --message="Reloading nginx"
 service "$app" restart
 systemctl reload nginx
 
@@ -232,3 +240,5 @@ Are you facing an issue, want to improve this app or say thank you?
 Please open a new issue in this project: https://github.com/YunoHost-Apps/kresus_ynh
 "
 ynh_send_readme_to_admin "$message"
+
+ynh_script_progression --message="Upgrade of $app completed" --last
