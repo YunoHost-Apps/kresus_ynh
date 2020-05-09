@@ -140,7 +140,9 @@ ynh_use_nodejs
 (
 	cd "$final_path"
 	chown -R "$app": "$final_path"
-	npm install --production --unsafe-perm
+
+	# ynh_npm only exists for YunoHost 3.8+
+	"$nodejs_path/npm" install --production --unsafe-perm
 )
 
 #=================================================
