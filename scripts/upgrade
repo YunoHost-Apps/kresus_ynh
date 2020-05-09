@@ -156,7 +156,8 @@ ynh_use_nodejs
 	# linked to modules compiled for the previous version.
 	ynh_secure_remove --file="$final_path/node_modules"
 
-	npm install --production --unsafe-perm
+	# ynh_npm only exists for YunoHost 3.8+
+	"$nodejs_path/npm" install --production --unsafe-perm
 )
 
 #=================================================
