@@ -33,18 +33,21 @@ db_name="$app"
 # BACKUP THE APP MAIN DIR
 #=================================================
 
+ynh_script_progression --message="Backing up the main directory..."
 ynh_backup "$final_path"
 
 #=================================================
 # BACKUP THE NGINX CONFIGURATION
 #=================================================
 
+ynh_script_progression --message="Backing up nginx config..."
 ynh_backup "/etc/nginx/conf.d/$domain.d/$app.conf"
 
 #=================================================
 # BACKUP THE POSTGRESQL DATABASE
 #=================================================
 
+ynh_script_progression --message="Backing up database..."
 ynh_psql_dump_db --database="$db_name" > ${YNH_CWD}/dump.sql
 
 #=================================================
@@ -53,5 +56,7 @@ ynh_psql_dump_db --database="$db_name" > ${YNH_CWD}/dump.sql
 # BACKUP SYSTEMD
 #=================================================
 
+ynh_script_progression --message="Backing up systemd service..."
 ynh_backup "/etc/systemd/system/$app.service"
 
+ynh_script_progression --message="Backup of $app completed" --last
