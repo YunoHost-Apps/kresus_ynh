@@ -64,8 +64,7 @@ Kresus is an open-source libre self-hosted personal finance manager. It allows y
  
 ---
 
-Developer info
-----------------
+## Developer info
 
 Please send your pull request to the [testing branch](https://github.com/YunoHost-Apps/kresus_ynh/tree/testing).
 

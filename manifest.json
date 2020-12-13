@@ -3,8 +3,8 @@
     "id": "kresus",
     "packaging_format": 1,
     "description": {
-        "en": "Kresus is a personal finance manager.",
-        "fr": "Kresus est un outil personnel de gestion de finances."
+        "en": "Personal finance manager.",
+        "fr": "Outil personnel de gestion de finances."
     },
     "url": "https://framagit.org/kresusapp/kresus",
     "license": "AGPL-3.0-only",
@@ -19,9 +19,9 @@
         }
     ],
     "requirements": {
-        "yunohost": ">= 3.6.0"
+        "yunohost": ">= 3.8.1"
     },
-    "version": "0.16.0~ynh4",
+    "version": "0.16.0~ynh5",
     "multi_instance": true,
     "services": [
         "nginx"
