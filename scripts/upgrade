@@ -70,7 +70,7 @@ ynh_abort_if_errors
 #=================================================
 ynh_script_progression --message="Installing app dependencies"
 
-ynh_install_app_dependencies $pkg_dependencies
+ynh_exec_warn_less  ynh_install_app_dependencies $pkg_dependencies
 
 # Now that postgresql is installed, check the db exists and the user is set up
 ynh_script_progression --message="Setting up database"
@@ -114,15 +114,15 @@ ynh_system_user_create "$app"
 #=================================================
 # Install nodesjs
 #=================================================
-
 ynh_script_progression --message="Installing nodejs"
-ynh_install_nodejs 12
+
+ynh_exec_warn_less ynh_install_nodejs --nodejs_version=$nodejs_version
 
 #=================================================
 # Install weboob with pip
 #=================================================
-
 ynh_script_progression --message="Installing weboob"
+
 ynh_secure_remove --file="${final_path}/venv"
 virtualenv --python=python3 --system-site-packages "${final_path}/venv"
 (
@@ -137,8 +137,8 @@ virtualenv --python=python3 --system-site-packages "${final_path}/venv"
 #=================================================
 # Install Kresus with npm
 #=================================================
-
 ynh_script_progression --message="Installing app"
+
 ynh_use_nodejs
 (
 	cd "$final_path"
@@ -149,7 +149,7 @@ ynh_use_nodejs
 	ynh_secure_remove --file="$final_path/node_modules"
 
 	# ynh_npm only exists for YunoHost 3.8+
-	"$nodejs_path/npm" install --production --unsafe-perm
+	ynh_exec_warn_less "$nodejs_path/npm" install --production --unsafe-perm
 )
 
 #=================================================

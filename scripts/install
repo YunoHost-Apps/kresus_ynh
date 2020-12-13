@@ -70,7 +70,8 @@ ynh_app_setting_set "$app" salt "$salt"
 #=================================================
 
 ynh_script_progression --message="Installing app dependencies"
-ynh_install_app_dependencies $pkg_dependencies
+
+ynh_exec_warn_less ynh_install_app_dependencies $pkg_dependencies
 
 #=================================================
 # DOWNLOAD, CHECK AND UNPACK SOURCE
@@ -99,8 +100,8 @@ ynh_store_file_checksum "/etc/nginx/conf.d/$domain.d/$app.conf"
 #=================================================
 # CREATE DEDICATED USER
 #=================================================
-
 ynh_script_progression --message="Creating system user"
+
 ynh_system_user_create "$app"
 
 #=================================================
@@ -108,15 +109,15 @@ ynh_system_user_create "$app"
 #=================================================
 # Install nodejs
 #=================================================
-
 ynh_script_progression --message="Installing nodejs"
-ynh_install_nodejs 12
+
+ynh_exec_warn_less ynh_install_nodejs --nodejs_version=$nodejs_version
 
 #=================================================
 # Install weboob with pip
 #=================================================
-
 ynh_script_progression --message="Installing weboob"
+
 virtualenv --python=python3 --system-site-packages "${final_path}/venv"
 (
 	set +o nounset
@@ -130,25 +131,25 @@ virtualenv --python=python3 --system-site-packages "${final_path}/venv"
 #=================================================
 # Install Kresus with npm
 #=================================================
-
 ynh_script_progression --message="Installing app"
+
 ynh_use_nodejs
 (
 	cd "$final_path"
 	chown -R "$app": "$final_path"
 
 	# ynh_npm only exists for YunoHost 3.8+
-	"$nodejs_path/npm" install --production --unsafe-perm
+	ynh_exec_warn_less "$nodejs_path/npm" install --production --unsafe-perm
 )
 
 #=================================================
 # Setup Kresus postgresql database
 #=================================================
+ynh_script_progression --message="Setting up database"
 
 db_name="$app"
 db_user="$app"
 
-ynh_script_progression --message="Setting up database"
 ynh_psql_test_if_first_run
 ynh_psql_setup_db "$db_user" "$db_name"
 db_pwd=$(ynh_app_setting_get "$app" psqlpwd)
@@ -203,8 +204,8 @@ chmod 600 "$final_path/config.ini"
 #=================================================
 # RELOAD NGINX
 #=================================================
-
 ynh_script_progression --message="Reloading nginx"
+
 service "$app" start
 service nginx reload
 

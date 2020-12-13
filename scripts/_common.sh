@@ -7,6 +7,8 @@
 # dependencies used by the app
 pkg_dependencies="dh-autoreconf	python3-pip python3-dev python3-lxml python3-pillow virtualenv postgresql libffi-dev"
 
+nodejs_version=12
+
 #=================================================
 # PERSONAL HELPERS
 #=================================================
