@@ -7,7 +7,6 @@
 #=================================================
 
 source ../settings/scripts/_common.sh
-source ../settings/scripts/_ynh_detect_arch
 source /usr/share/yunohost/helpers
 
 #=================================================
@@ -23,14 +22,13 @@ ynh_abort_if_errors
 
 app=$YNH_APP_INSTANCE_NAME
 
-db_name="$app"
-db_user="$app"
-
-domain=$(ynh_app_setting_get "$app" domain)
-path_url=$(ynh_app_setting_get "$app" path)
-final_path=$(ynh_app_setting_get "$app" final_path)
-salt=$(ynh_app_setting_get "$app" salt)
-db_pwd=$(ynh_app_setting_get "$app" psqlpwd)
+domain=$(ynh_app_setting_get --app=$app --key=domain)
+path_url=$(ynh_app_setting_get --app=$app --key=path)
+final_path=$(ynh_app_setting_get --app=$app --key=final_path)
+salt=$(ynh_app_setting_get --app=$app --key=salt)
+db_name=$(ynh_app_setting_get --app=$app --key=db_name)
+db_user=$db_name
+db_pwd=$(ynh_app_setting_get --app=$app --key=psqlpwd)
 
 #=================================================
 # CHECK IF THE APP CAN BE RESTORED
@@ -59,16 +57,15 @@ ynh_restore_file "/etc/nginx/conf.d/$domain.d/$app.conf"
 #=================================================
 # RESTORE THE APP MAIN DIR
 #=================================================
-
 ynh_script_progression --message="Restoring files"
+
 ynh_restore_file "$final_path"
 
 #=================================================
 # RECREATE THE DEDICATED USER
 #=================================================
-
-# Create the dedicated user (if not existing)
 ynh_script_progression --message="Creating system user"
+
 ynh_system_user_create "$app"
 
 #=================================================
@@ -76,7 +73,7 @@ ynh_system_user_create "$app"
 #=================================================
 
 # Restore permissions on app files
-chown -R "$app": "$final_path"
+chown -R $app: "$final_path"
 chmod 600 "$final_path/config.ini"
 
 #=================================================
@@ -84,49 +81,54 @@ chmod 600 "$final_path/config.ini"
 #=================================================
 # REINSTALL DEPENDENCIES
 #=================================================
-
 ynh_script_progression --message="Installing app dependencies"
-ynh_install_app_dependencies $pkg_dependencies
+
+ynh_exec_warn_less ynh_install_app_dependencies $pkg_dependencies
 
 #=================================================
 # INSTALL NODEJS
 #=================================================
-
 ynh_script_progression --message="Installing nodejs"
-ynh_install_nodejs 12
+
+ynh_exec_warn_less ynh_install_nodejs --nodejs_version=$nodejs_version
 
 #=================================================
 # RESTORE THE POSTGRESQL DATABASE
 #=================================================
-
 ynh_script_progression --message="Restoring database"
+
 ynh_psql_test_if_first_run
 ynh_print_OFF
-ynh_psql_setup_db "$db_user" "$db_name" "$db_pwd"
+ynh_psql_setup_db --db_user=$db_user --db_name=$db_name --db_pwd=$db_pwd
 ynh_print_ON
-ynh_psql_execute_file_as_root --file="${YNH_CWD}/dump.sql" --database="$db_name"
+ynh_psql_execute_file_as_root --file="./db.sql" --database=$db_name
 
 #=================================================
 # RESTORE SYSTEMD
 #=================================================
 
 ynh_restore_file "/etc/systemd/system/$app.service"
-systemctl enable "$app".service
+systemctl enable $app.service --quiet
 
 #=================================================
-# START KRESUS
+# START SYSTEMD SERVICE
 #=================================================
+ynh_script_progression --message="Starting a systemd service..."
 
-ynh_script_progression --message="Starting application"
-systemctl start "$app"
+# Start a systemd service
+ynh_systemd_action --service_name=$app --action="start"
 
 #=================================================
 # GENERIC FINALIZATION
 #=================================================
-# RELOAD NGINX AND PHP-FPM
+# RELOAD NGINX
+#=================================================
+ynh_script_progression --message="Reloading NGINX web server..."
+
+ynh_systemd_action --service_name=nginx --action=reload
+
+#=================================================
+# END OF SCRIPT
 #=================================================
 
-ynh_script_progression --message="Reloading nginx"
-systemctl reload nginx
-
-ynh_script_progression --message="Restoration of $app completed" --last
+ynh_script_progression --message="Restoration completed for $app" --last

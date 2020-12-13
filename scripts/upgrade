@@ -16,34 +16,41 @@ source /usr/share/yunohost/helpers
 # Exit if an error occurs during the execution of the script
 ynh_abort_if_errors
 
+#=================================================
+# LOAD SETTINGS
+#=================================================
+ynh_script_progression --message="Loading installation settings..."
+
 app=$YNH_APP_INSTANCE_NAME
 
-db_name="$app"
-db_user="$app"
-
-domain=$(ynh_app_setting_get "$app" domain)
-path_url=$(ynh_app_setting_get "$app" path)
-final_path=$(ynh_app_setting_get "$app" final_path)
-port=$(ynh_app_setting_get "$app" port)
-salt=$(ynh_app_setting_get "$app" salt)
-db_pwd=$(ynh_app_setting_get "$app" psqlpwd)
+domain=$(ynh_app_setting_get --app=$app --key=domain)
+path_url=$(ynh_app_setting_get --app=$app --key=path)
+final_path=$(ynh_app_setting_get --app=$app --key=final_path)
+port=$(ynh_app_setting_get --app=$app --key=port)
+salt=$(ynh_app_setting_get --app=$app --key=salt)
+db_name=$(ynh_app_setting_get --app=$app --key=db_name)
+db_user=$db_name
+db_pwd=$(ynh_app_setting_get --app=$app --key=psqlpwd)
 
 #=================================================
 # ENSURE DOWNWARD COMPATIBILITY
 #=================================================
 
 # If final_path doesn't exist, create it
-if [ -z "$final_path" ]; then
+if [ -z "$final_path" ]
+then
 	final_path=/var/www/$app
 	ynh_app_setting_set "$app" final_path "$final_path"
 fi
 
-if [ -d "/home/ynh$app" ]; then
+if [ -d "/home/ynh$app" ]
+then
 	mv "/home/ynh$app/data" "$final_path/data"
 	ynh_secure_remove --file="/home/ynh$app"
 fi
 
-if [ -z "$salt" ]; then
+if [ -z "$salt" ]
+then
 	salt=$(ynh_string_random 40)
 	ynh_app_setting_set "$app" salt "$salt"
 fi
@@ -51,8 +58,8 @@ fi
 #=================================================
 # BACKUP BEFORE UPGRADE THEN ACTIVE TRAP
 #=================================================
-
 ynh_script_progression --message="Backing up the app"
+
 # Backup the current version of the app
 ynh_backup_before_upgrade
 ynh_clean_setup () {
@@ -64,73 +71,68 @@ ynh_clean_setup () {
 ynh_abort_if_errors
 
 #=================================================
-# CHECK THE PATH
-#=================================================
-
-# Normalize the URL path syntax
-path_url=$(ynh_normalize_url_path "$path_url")
-
-#=================================================
 # STANDARD UPGRADE STEPS
 #=================================================
 # INSTALL DEPENDENCIES
 #=================================================
-
 ynh_script_progression --message="Installing app dependencies"
-ynh_install_app_dependencies $pkg_dependencies
 
+ynh_exec_warn_less ynh_install_app_dependencies $pkg_dependencies
 
 # Now that postgresql is installed, check the db exists and the user is set up
-ynh_script_progression --message="Setting up database"
-if [ -z "$db_pwd" ]; then
+if [ -z "$db_pwd" ]
+then
+	ynh_script_progression --message="Setting up database"
+	db_name=$(ynh_sanitize_dbid --db_name=$app)
+	db_user=$db_name
+	ynh_app_setting_set --app=$app --key=db_name --value=$db_name
+
 	ynh_psql_test_if_first_run
-	ynh_psql_setup_db "$db_user" "$db_name"
-	db_pwd=$(ynh_app_setting_get "$app" psqlpwd)
+	ynh_psql_setup_db --db_user=$db_user --db_name=$db_name
+	db_pwd=$(ynh_app_setting_get --app=$app --key=psqlpwd)
 fi
 
 #=================================================
 # DOWNLOAD, CHECK AND UNPACK SOURCE
 #=================================================
-
-# Download, check integrity, uncompress and patch the source from app.src
 ynh_script_progression --message="Downloading app from sources"
-ynh_setup_source "$final_path"
-mkdir -p "$final_path/data"
+
+ynh_setup_source --dest_dir="$final_path"
+
+if [ -z "$final_path/data" ]
+then
+	mkdir "$final_path/data"
+fi
 
 #=================================================
 # NGINX CONFIGURATION
 #=================================================
+ynh_script_progression --message="Upgrading NGINX web server configuration..."
 
-# Create a dedicated nginx config
+# Create a dedicated NGINX config
 ynh_add_nginx_config
-if [ "$path_url" != "/" ]
-then
-	ynh_replace_string "^#sub_path_only" "" "/etc/nginx/conf.d/$domain.d/$app.conf"
-fi
-ynh_store_file_checksum "/etc/nginx/conf.d/$domain.d/$app.conf"
 
 #=================================================
 # CREATE DEDICATED USER
 #=================================================
-
 ynh_script_progression --message="Creating system user"
-ynh_system_user_create "$app"
 
+ynh_system_user_create --username=$app
 
 #=================================================
 # SPECIFIC UPGRADE
 #=================================================
 # Install nodesjs
 #=================================================
-
 ynh_script_progression --message="Installing nodejs"
-ynh_install_nodejs 12
+
+ynh_exec_warn_less ynh_install_nodejs --nodejs_version=$nodejs_version
 
 #=================================================
 # Install weboob with pip
 #=================================================
-
 ynh_script_progression --message="Installing weboob"
+
 ynh_secure_remove --file="${final_path}/venv"
 virtualenv --python=python3 --system-site-packages "${final_path}/venv"
 (
@@ -145,19 +147,18 @@ virtualenv --python=python3 --system-site-packages "${final_path}/venv"
 #=================================================
 # Install Kresus with npm
 #=================================================
-
 ynh_script_progression --message="Installing app"
+
 ynh_use_nodejs
 (
 	cd "$final_path"
-	chown -R "$app": "$final_path"
+	chown -R $app: "$final_path"
 
 	# In case of nodejs upgrade, remove the current node_modules to make sure there are no errors
 	# linked to modules compiled for the previous version.
 	ynh_secure_remove --file="$final_path/node_modules"
 
-	# ynh_npm only exists for YunoHost 3.8+
-	"$nodejs_path/npm" install --production --unsafe-perm
+	ynh_exec_warn_less ynh_npm install --production --unsafe-perm
 )
 
 #=================================================
@@ -168,15 +169,15 @@ ynh_backup_if_checksum_is_different "$final_path/config.ini"
 
 cp ../conf/config.ini "$final_path/config.ini"
 
-ynh_replace_string "__PORT__"          "$port"               "$final_path/config.ini"
-ynh_replace_string "__PATH__"          "$path_url"           "$final_path/config.ini"
-ynh_replace_string "__FINALPATH__"     "$final_path"         "$final_path/config.ini"
-ynh_replace_string "__SALT__"          "$salt"               "$final_path/config.ini"
-ynh_replace_string "__APP__"           "$app"                "$final_path/config.ini"
-ynh_replace_string "__DOMAIN__"        "$domain"             "$final_path/config.ini"
-ynh_replace_string "__DB_NAME__"       "$db_user"            "$final_path/config.ini"
-ynh_replace_string "__DB_USER__"       "$db_name"            "$final_path/config.ini"
-ynh_replace_string "__DB_PASSWORD__"   "$db_pwd"             "$final_path/config.ini"
+ynh_replace_string --match_string="__PORT__"        --replace_string="$port"       --target_file="$final_path/config.ini"
+ynh_replace_string --match_string="__PATH__"        --replace_string="$path_url"   --target_file="$final_path/config.ini"
+ynh_replace_string --match_string="__FINALPATH__"   --replace_string="$final_path" --target_file="$final_path/config.ini"
+ynh_replace_string --match_string="__SALT__"        --replace_string="$salt"       --target_file="$final_path/config.ini"
+ynh_replace_string --match_string="__APP__"         --replace_string="$app"        --target_file="$final_path/config.ini"
+ynh_replace_string --match_string="__DOMAIN__"      --replace_string="$domain"     --target_file="$final_path/config.ini"
+ynh_replace_string --match_string="__DB_NAME__"     --replace_string="$db_name"    --target_file="$final_path/config.ini"
+ynh_replace_string --match_string="__DB_USER__"     --replace_string="$db_user"    --target_file="$final_path/config.ini"
+ynh_replace_string --match_string="__DB_PASSWORD__" --replace_string="$db_pwd"     --target_file="$final_path/config.ini"
 
 # Calculate and store the config file checksum into the app settings
 ynh_store_file_checksum "$final_path/config.ini"
@@ -185,9 +186,8 @@ ynh_store_file_checksum "$final_path/config.ini"
 # SETUP SYSTEMD
 #=================================================
 
-ynh_replace_string "__NODEJS__"   "$nodejs_path"              ../conf/systemd.service
-ynh_replace_string "__ENV_PATH__" "$PATH"                     ../conf/systemd.service
-ynh_replace_string "__NODEPATH__" "$(dirname "$nodejs_path")" ../conf/systemd.service
+ynh_replace_string --match_string="__ENV_PATH__" --replace_string="$PATH"                     --target_file="../conf/systemd.service"
+ynh_replace_string --match_string="__NODEPATH__" --replace_string="$(dirname "$nodejs_path")" --target_file="../conf/systemd.service"
 
 # Create a dedicated systemd config
 ynh_script_progression --message="Creating systemd configuration"
@@ -203,11 +203,11 @@ ynh_add_systemd_config
 chown -R root:root "$final_path"
 
 # Set permissions to app files
-chown -R "$app":"$app" "$final_path/data/"
+chown -R $app:$app "$final_path/data/"
 chmod -R 750 "$final_path/data/"
 
 # Set permissions to config files
-chown "$app" "$final_path/config.ini"
+chown $app "$final_path/config.ini"
 chmod 600 "$final_path/config.ini"
 
 if [ -f "$final_path/data/weboob-data/backends" ]
@@ -216,12 +216,19 @@ then
 fi
 
 #=================================================
+# START SYSTEMD SERVICE
+#=================================================
+ynh_script_progression --message="Starting a systemd service..."
+
+# Start a systemd service
+ynh_systemd_action --service_name=$app --action="start"
+
+#=================================================
 # RELOAD NGINX
 #=================================================
+ynh_script_progression --message="Reloading NGINX web server..."
 
-ynh_script_progression --message="Reloading nginx"
-service "$app" restart
-systemctl reload nginx
+ynh_systemd_action --service_name=nginx --action=reload
 
 #=================================================
 # SEND README TO ADMIN
@@ -241,5 +248,9 @@ Are you facing an issue, want to improve this app or say thank you?
 Please open a new issue in this project: https://github.com/YunoHost-Apps/kresus_ynh
 "
 ynh_send_readme_to_admin "$message"
+
+#=================================================
+# END OF SCRIPT
+#=================================================
 
 ynh_script_progression --message="Upgrade of $app completed" --last
