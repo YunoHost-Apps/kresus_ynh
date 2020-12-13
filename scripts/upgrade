@@ -64,21 +64,13 @@ ynh_clean_setup () {
 ynh_abort_if_errors
 
 #=================================================
-# CHECK THE PATH
-#=================================================
-
-# Normalize the URL path syntax
-path_url=$(ynh_normalize_url_path "$path_url")
-
-#=================================================
 # STANDARD UPGRADE STEPS
 #=================================================
 # INSTALL DEPENDENCIES
 #=================================================
-
 ynh_script_progression --message="Installing app dependencies"
-ynh_install_app_dependencies $pkg_dependencies
 
+ynh_install_app_dependencies $pkg_dependencies
 
 # Now that postgresql is installed, check the db exists and the user is set up
 ynh_script_progression --message="Setting up database"

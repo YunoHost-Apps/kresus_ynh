@@ -7,7 +7,6 @@
 #=================================================
 
 source ../settings/scripts/_common.sh
-source ../settings/scripts/_ynh_detect_arch
 source /usr/share/yunohost/helpers
 
 #=================================================
@@ -111,7 +110,7 @@ ynh_psql_execute_file_as_root --file="${YNH_CWD}/dump.sql" --database="$db_name"
 #=================================================
 
 ynh_restore_file "/etc/systemd/system/$app.service"
-systemctl enable "$app".service
+systemctl enable "$app".service --quiet
 
 #=================================================
 # START KRESUS

@@ -7,7 +7,6 @@
 #=================================================
 
 source _common.sh
-source _ynh_detect_arch
 source /usr/share/yunohost/helpers
 
 #=================================================
@@ -41,9 +40,6 @@ fi
 
 final_path="/var/www/$app"
 test ! -e "$final_path" || ynh_die "This path already contains a folder"
-
-# Normalize the url path syntax
-path_url=$(ynh_normalize_url_path "$path_url")
 
 # Check web path availability
 ynh_webpath_available "$domain" "$path_url"
