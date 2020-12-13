@@ -141,8 +141,8 @@ ynh_use_nodejs
 #=================================================
 ynh_script_progression --message="Setting up database"
 
-db_name=$(ynh_sanitize_dbid --db_name=$app)
-db_user=$db_name
+db_name="$app"
+db_user="$app"
 
 ynh_psql_test_if_first_run
 ynh_app_setting_set --app=$app --key=db_name --value=$db_name

@@ -22,14 +22,13 @@ ynh_abort_if_errors
 
 app=$YNH_APP_INSTANCE_NAME
 
-db_name=$(ynh_app_setting_get --app=$app --key=db_name)
-db_user=$db_name
-
 domain=$(ynh_app_setting_get --app=$ap --key=domain)
 path_url=$(ynh_app_setting_get --app=$app --key=path)
 final_path=$(ynh_app_setting_get --app=$app --key=final_path)
 salt=$(ynh_app_setting_get --app=$app --key=salt)
 db_pwd=$(ynh_app_setting_get --app=$app --key=psqlpwd)
+db_name="$app"
+db_user="$app"
 
 #=================================================
 # CHECK IF THE APP CAN BE RESTORED
@@ -102,7 +101,7 @@ ynh_psql_test_if_first_run
 ynh_print_OFF
 ynh_psql_setup_db --db_user=$db_user --db_name=$db_name --db_pwd=$db_pwd
 ynh_print_ON
-ynh_psql_execute_file_as_root --file="./db.sql" --database=$db_name
+ynh_psql_execute_file_as_root --file="${YNH_CWD}/dump.sql" --database="$db_name"
 
 #=================================================
 # RESTORE SYSTEMD
