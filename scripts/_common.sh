@@ -1,6 +1,6 @@
 #!/bin/bash
 
-pkg_dependencies="dh-autoreconf	python3-pip python3-dev python3-lxml python3-pillow virtualenv postgresql"
+pkg_dependencies="dh-autoreconf	python3-pip python3-dev python3-lxml python3-pillow virtualenv postgresql libffi-dev"
 
 # Send an email to inform the administrator
 #
