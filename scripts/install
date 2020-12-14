@@ -144,9 +144,7 @@ ynh_script_progression --message="Creating a PostgreSQL database..."
 db_name=$(ynh_sanitize_dbid --db_name=$app)
 db_user=$db_name
 db_pwd=$(ynh_app_setting_get --app=$app --key=psqlpwd)
-
 ynh_app_setting_set --app=$app --key=db_name --value=$db_name
-ynh_app_setting_set --app=$app --key=db_pwd  --value=$db_pwd
 
 ynh_psql_test_if_first_run
 ynh_psql_setup_db --db_user=$db_user --db_name=$db_name --db_pwd=$db_pwd
@@ -203,7 +201,7 @@ chmod 600 "$final_path/config.ini"
 ynh_script_progression --message="Starting a systemd service..."
 
 # Start a systemd service
-ynh_systemd_action --service_name=$app --action="start" --log_path="/var/log/$app/$app.log"
+ynh_systemd_action --service_name=$app --action="start"
 
 #=================================================
 # RELOAD NGINX
