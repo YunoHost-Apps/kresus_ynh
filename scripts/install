@@ -163,8 +163,8 @@ ynh_replace_string --match_string="__FINALPATH__"   --replace_string="$final_pat
 ynh_replace_string --match_string="__SALT__"        --replace_string="$salt"       --target_file="$final_path/config.ini"
 ynh_replace_string --match_string="__APP__"         --replace_string="$app"        --target_file="$final_path/config.ini"
 ynh_replace_string --match_string="__DOMAIN__"      --replace_string="$domain"     --target_file="$final_path/config.ini"
-ynh_replace_string --match_string="__DB_NAME__"     --replace_string="$db_user"    --target_file="$final_path/config.ini"
-ynh_replace_string --match_string="__DB_USER__"     --replace_string="$db_name"    --target_file="$final_path/config.ini"
+ynh_replace_string --match_string="__DB_NAME__"     --replace_string="$db_name"    --target_file="$final_path/config.ini"
+ynh_replace_string --match_string="__DB_USER__"     --replace_string="$db_user"    --target_file="$final_path/config.ini"
 ynh_replace_string --match_string="__DB_PASSWORD__" --replace_string="$db_pwd"     --target_file="$final_path/config.ini"
 
 # Calculate and store the config file checksum into the app settings
@@ -196,6 +196,14 @@ chmod -R 750 "$final_path/data/"
 # Set permissions to config file
 chown $app "$final_path/config.ini"
 chmod 600 "$final_path/config.ini"
+
+#=================================================
+# START SYSTEMD SERVICE
+#=================================================
+ynh_script_progression --message="Starting a systemd service..."
+
+# Start a systemd service
+ynh_systemd_action --service_name=$app --action="start" --log_path="/var/log/$app/$app.log"
 
 #=================================================
 # RELOAD NGINX
