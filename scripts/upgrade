@@ -91,7 +91,9 @@ ynh_script_progression --message="Downloading app from sources"
 
 ynh_setup_source --dest_dir="$final_path"
 
-mkdir "$final_path/data"
+if [ -z "$final_path/data" ]; then
+	mkdir "$final_path/data"
+fi
 
 #=================================================
 # NGINX CONFIGURATION
