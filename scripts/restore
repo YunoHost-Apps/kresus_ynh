@@ -28,7 +28,7 @@ final_path=$(ynh_app_setting_get --app=$app --key=final_path)
 salt=$(ynh_app_setting_get --app=$app --key=salt)
 db_name=$(ynh_app_setting_get --app=$app --key=db_name)
 db_user=$db_name
-db_pwd=$(ynh_app_setting_get --app=$app --key=db_pwd)
+db_pwd=$(ynh_app_setting_get --app=$app --key=psqlpwd)
 
 #=================================================
 # CHECK IF THE APP CAN BE RESTORED
