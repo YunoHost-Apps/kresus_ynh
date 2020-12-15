@@ -217,7 +217,6 @@ ynh_systemd_action --service_name=$app --action="start"
 #=================================================
 
 ynh_script_progression --message="Reloading nginx"
-service "$app" start
 service nginx reload
 
 #=================================================
