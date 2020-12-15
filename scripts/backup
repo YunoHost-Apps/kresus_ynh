@@ -63,4 +63,4 @@ ynh_backup "/etc/systemd/system/$app.service"
 # END OF SCRIPT
 #=================================================
 
-ynh_print_info --message="Backup of $app completed"
+ynh_print_info --message="Backup of $app completed" --last
