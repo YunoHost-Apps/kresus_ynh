@@ -136,7 +136,7 @@ ynh_use_nodejs
 	chown -R "$app": "$final_path"
 
 	# ynh_npm only exists for YunoHost 3.8+
-	ynh_exec_warn_less "$nodejs_path/npm" install --production --unsafe-perm
+	ynh_exec_warn_less ynh_npm install --production --unsafe-perm
 )
 
 #=================================================
@@ -177,7 +177,6 @@ ynh_store_file_checksum "$final_path/config.ini"
 #=================================================
 ynh_script_progression --message="Creating systemd configuration"
 
-ynh_replace_string --match_string="__NODEJS__"   --replace_string="$nodejs_path"              --target_file="../conf/systemd.service"
 ynh_replace_string --match_string="__ENV_PATH__" --replace_string="$PATH"                     --target_file="../conf/systemd.service"
 ynh_replace_string --match_string="__NODEPATH__" --replace_string="$(dirname "$nodejs_path")" --target_file="../conf/systemd.service"
 
