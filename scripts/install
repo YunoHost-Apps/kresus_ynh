@@ -108,9 +108,9 @@ ynh_script_progression --message="Installing nodejs"
 ynh_exec_warn_less ynh_install_nodejs --nodejs_version=$nodejs_version
 
 #=================================================
-# Install weboob with pip
+# Install woob with pip
 #=================================================
-ynh_script_progression --message="Installing weboob"
+ynh_script_progression --message="Installing woob"
 
 virtualenv --python=python3 --system-site-packages "${final_path}/venv"
 (
@@ -119,7 +119,7 @@ virtualenv --python=python3 --system-site-packages "${final_path}/venv"
 	set -o nounset
 
 	pip install --upgrade pip
-	pip install weboob html2text simplejson BeautifulSoup4 PyExecJS pdfminer.six --ignore-installed
+	pip install woob html2text simplejson BeautifulSoup4 PyExecJS pdfminer.six --ignore-installed
 )
 
 #=================================================
