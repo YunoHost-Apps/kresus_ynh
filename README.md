@@ -1,6 +1,6 @@
 # Kresus for YunoHost
 
-[![Integration level](https://dash.yunohost.org/integration/kresus.svg)](https://dash.yunohost.org/appci/app/kresus) ![](https://ci-apps.yunohost.org/ci/badges/kresus.status.svg) ![](https://ci-apps.yunohost.org/ci/badges/kresus.maintain.svg)   
+[![Integration level](https://dash.yunohost.org/integration/kresus.svg)](https://dash.yunohost.org/appci/app/kresus) ![](https://ci-apps.yunohost.org/ci/badges/kresus.status.svg) ![](https://ci-apps.yunohost.org/ci/badges/kresus.maintain.svg)
 [![Install Kresus with YunoHost](https://install-app.yunohost.org/install-with-yunohost.png)](https://install-app.yunohost.org/?app=kresus)
 
 > *This package allows you to install Kresus quickly and simply on a YunoHost server.
@@ -10,7 +10,7 @@ If you don't have YunoHost, please see [here](https://yunohost.org/#/install) to
 
 Kresus is an open-source libre self-hosted personal finance manager. It allows you to safely track your banking history, check your overall balance and know exactly how you are spending money using categories!
 
-**Shipped version:** 0.16.0
+**Shipped version:** 0.17.2
 
 ## Screenshots
 
@@ -61,7 +61,7 @@ Kresus is an open-source libre self-hosted personal finance manager. It allows y
  * Report a bug about Kresus itself: https://framagit.org/kresusapp/kresus
  * Kresus website: https://kresus.org
  * YunoHost website: https://yunohost.org
- 
+
 ---
 
 ## Developer info
