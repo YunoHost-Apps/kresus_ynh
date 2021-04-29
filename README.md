@@ -37,7 +37,7 @@ Kresus is an open-source libre self-hosted personal finance manager. It allows y
 
 ## Limitations
 
-* By default, all users have access to the accounts. Need to manually select authorised user through YunoHost Administration Panel.
+* By default, all users have access to the accounts. The admin needs to manually select the authorised user through YunoHost Administration Panel.
 
 # Additional information
 
@@ -51,6 +51,7 @@ Kresus is an open-source libre self-hosted personal finance manager. It allows y
   * [x] ARM support
 
 * to be added:
+  * [ ] URL cannot be changed
   * [ ] Email support
   * [ ] Improve log file and add logrotate
   * [ ] Add user who will access the app (by default every one has access to the installed app)
