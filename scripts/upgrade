@@ -163,7 +163,7 @@ ynh_use_nodejs
 	# linked to modules compiled for the previous version.
 	ynh_secure_remove --file="$final_path/node_modules"
 
-	ynh_exec_warn_less ynh_npm install --production --unsafe-perm
+	ynh_exec_warn_less $ynh_npm install --production --unsafe-perm
 )
 
 #=================================================
