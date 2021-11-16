@@ -132,7 +132,7 @@ ynh_use_nodejs
 	cd "$final_path"
 	chown -R "$app": "$final_path"
 
-	ynh_exec_warn_less ynh_npm install --production --unsafe-perm
+	ynh_exec_warn_less $ynh_npm install --production --unsafe-perm
 )
 
 #=================================================
