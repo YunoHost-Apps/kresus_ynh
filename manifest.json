@@ -3,8 +3,8 @@
     "id": "kresus",
     "packaging_format": 1,
     "description": {
-        "en": "Personal finance manager.",
-        "fr": "Outil personnel de gestion de finances."
+        "en": "Personal finance manager",
+        "fr": "Outil personnel de gestion de finances"
     },
     "url": "https://framagit.org/kresusapp/kresus",
     "license": "AGPL-3.0-only",
@@ -19,7 +19,7 @@
         }
     ],
     "requirements": {
-        "yunohost": ">= 3.8.1"
+        "yunohost": ">= 4.3.0"
     },
     "version": "0.17.4~ynh1",
     "multi_instance": true,
@@ -30,20 +30,11 @@
         "install" : [
             {
                 "name": "domain",
-                "type": "domain",
-                "ask": {
-                    "en": "Choose a domain name for Kresus",
-                    "fr": "Choisissez un nom de domaine pour Kresus"
-                },
-                "example": "example.com"
+                "type": "domain"
             },
             {
                 "name": "path",
                 "type": "path",
-                "ask": {
-                    "en": "Choose a path for Kresus",
-                    "fr": "Choisissez un chemin pour Kresus"
-                },
                 "example": "/kresus",
                 "default": "/kresus"
             }
