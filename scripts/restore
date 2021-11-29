@@ -41,10 +41,8 @@ then
 	ynh_die --message="Sorry, because of nodejs framework, this app can't be installed on i386 (32 bits) machine."
 fi
 
-ynh_webpath_available "$domain" "$path_url" \
-	|| ynh_die "Path not available: ${domain}${path_url}"
-test ! -d "$final_path" \
-	|| ynh_die "There is already a directory: $final_path "
+
+test ! -d "$final_path" || ynh_die "There is already a directory: $final_path "
 
 #=================================================
 # STANDARD RESTORATION STEPS
