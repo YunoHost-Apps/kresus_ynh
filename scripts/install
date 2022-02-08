@@ -13,14 +13,16 @@ source /usr/share/yunohost/helpers
 # MANAGE SCRIPT FAILURE
 #=================================================
 
+ynh_clean_setup () {
+	ynh_clean_check_starting
+}
 # Exit if an error occurs during the execution of the script
 ynh_abort_if_errors
 
 #=================================================
 # RETRIEVE ARGUMENTS FROM THE MANIFEST
-#================================================
+#=================================================
 
-# Retrieve arguments
 domain=$YNH_APP_ARG_DOMAIN
 path_url=$YNH_APP_ARG_PATH
 architecture=$YNH_ARCH
@@ -38,8 +40,8 @@ then
 	ynh_die --message="Sorry, because of nodejs framework, this app can't be installed on i386 (32 bits) machine."
 fi
 
-final_path="/var/www/$app"
-test ! -e "$final_path" || ynh_die "This path already contains a folder"
+final_path=/var/www/$app
+test ! -e "$final_path" || ynh_die --message="This path already contains a folder"
 
 # Register (book) web path
 ynh_webpath_register --app=$app --domain=$domain --path_url=$path_url
@@ -53,24 +55,45 @@ ynh_app_setting_set --app=$app --key=domain --value=$domain
 ynh_app_setting_set --app=$app --key=path --value=$path_url
 
 #=================================================
-# DEFAULT SETTINGS
+# STANDARD MODIFICATIONS
+#=================================================
+# FIND AND OPEN A PORT
 #=================================================
 ynh_script_progression --message="Finding an available port..."
 
 port=$(ynh_find_port --port=9876)
-salt=$(ynh_string_random 40)
-
 ynh_app_setting_set --app=$app --key=port --value=$port
+
+salt=$(ynh_string_random --length=40)
 ynh_app_setting_set --app=$app --key=salt --value=$salt
 
 #=================================================
-# STANDARD MODIFICATIONS
-#=================================================
 # INSTALL DEPENDENCIES
 #=================================================
-ynh_script_progression --message="Installing app dependencies"
+ynh_script_progression --message="Installing dependencies..."
 
 ynh_exec_warn_less ynh_install_app_dependencies $pkg_dependencies
+ynh_exec_warn_less ynh_install_nodejs --nodejs_version=$nodejs_version
+
+#=================================================
+# CREATE DEDICATED USER
+#=================================================
+ynh_script_progression --message="Configuring system user..."
+
+# Create a system user
+ynh_system_user_create --username=$app --home_dir="$final_path"
+
+#=================================================
+# CREATE A POSTGRESQL DATABASE
+#=================================================
+ynh_script_progression --message="Creating a PostgreSQL database..."
+
+db_name=$(ynh_sanitize_dbid --db_name=$app)
+db_user=$db_name
+ynh_app_setting_set --app=$app --key=db_name --value=$db_name
+ynh_psql_test_if_first_run
+ynh_psql_setup_db --db_user=$db_user --db_name=$db_name
+db_pwd=$(ynh_app_setting_get --app=$app --key=psqlpwd)
 
 #=================================================
 # DOWNLOAD, CHECK AND UNPACK SOURCE
@@ -83,34 +106,24 @@ ynh_setup_source --dest_dir="$final_path"
 
 mkdir "$final_path/data"
 
+chmod 750 "$final_path"
+chmod -R o-rwx "$final_path"
+chown -R $app:www-data "$final_path"
+
 #=================================================
 # NGINX CONFIGURATION
 #=================================================
 ynh_script_progression --message="Configuring NGINX web server..."
 
-# Create a dedicated nginx config
+# Create a dedicated NGINX config
 ynh_add_nginx_config
-
-#=================================================
-# CREATE DEDICATED USER
-#=================================================
-ynh_script_progression --message="Creating system user"
-
-ynh_system_user_create --username=$app
 
 #=================================================
 # SPECIFIC SETUP
 #=================================================
-# Install nodejs
+# INSTALL WOOB WITH PIP
 #=================================================
-ynh_script_progression --message="Installing nodejs"
-
-ynh_exec_warn_less ynh_install_nodejs --nodejs_version=$nodejs_version
-
-#=================================================
-# Install woob with pip
-#=================================================
-ynh_script_progression --message="Installing woob"
+ynh_script_progression --message="Installing woob..."
 
 virtualenv --python=python3 --system-site-packages "${final_path}/venv"
 (
@@ -123,9 +136,9 @@ virtualenv --python=python3 --system-site-packages "${final_path}/venv"
 )
 
 #=================================================
-# Install Kresus with npm
+# INTSALL KRESUS WITH NPM
 #=================================================
-ynh_script_progression --message="Installing app"
+ynh_script_progression --message="Installing app..."
 
 ynh_use_nodejs
 (
@@ -136,63 +149,42 @@ ynh_use_nodejs
 )
 
 #=================================================
-# Setup Kresus postgresql database
+# ADD A CONFIGURATION
 #=================================================
-ynh_script_progression --message="Creating a PostgreSQL database..."
+ynh_script_progression --message="Adding a configuration file..."
 
-db_name=$(ynh_sanitize_dbid --db_name=$app)
-db_user=$db_name
+ynh_add_config --template="../conf/config.ini" --destination="$final_path/config.ini"
 
-ynh_app_setting_set --app=$app --key=db_name --value=$db_name
-
-ynh_psql_test_if_first_run
-ynh_psql_setup_db --db_user=$db_user --db_name=$db_name
-db_pwd=$(ynh_app_setting_get --app=$app --key=psqlpwd)
-
-#=================================================
-# CONFIGURE KRESUS
-#=================================================
-
-cp ../conf/config.ini "$final_path/config.ini"
-
-ynh_replace_string --match_string="__PORT__"        --replace_string="$port"       --target_file="$final_path/config.ini"
-ynh_replace_string --match_string="__PATH__"        --replace_string="$path_url"   --target_file="$final_path/config.ini"
-ynh_replace_string --match_string="__FINALPATH__"   --replace_string="$final_path" --target_file="$final_path/config.ini"
-ynh_replace_string --match_string="__SALT__"        --replace_string="$salt"       --target_file="$final_path/config.ini"
-ynh_replace_string --match_string="__APP__"         --replace_string="$app"        --target_file="$final_path/config.ini"
-ynh_replace_string --match_string="__DOMAIN__"      --replace_string="$domain"     --target_file="$final_path/config.ini"
-ynh_replace_string --match_string="__DB_NAME__"     --replace_string="$db_name"    --target_file="$final_path/config.ini"
-ynh_replace_string --match_string="__DB_USER__"     --replace_string="$db_user"    --target_file="$final_path/config.ini"
-ynh_replace_string --match_string="__DB_PASSWORD__" --replace_string="$db_pwd"     --target_file="$final_path/config.ini"
-
-# Calculate and store the config file checksum into the app settings
-ynh_store_file_checksum "$final_path/config.ini"
+chmod 400 "$final_path/config.ini"
+chown $app:$app "$final_path/config.ini"
 
 #=================================================
 # SETUP SYSTEMD
 #=================================================
-ynh_script_progression --message="Creating systemd configuration"
-
-ynh_replace_string --match_string="__ENV_PATH__" --replace_string="$PATH"                     --target_file="../conf/systemd.service"
-ynh_replace_string --match_string="__NODEPATH__" --replace_string="$(dirname "$nodejs_path")" --target_file="../conf/systemd.service"
+ynh_script_progression --message="Configuring a systemd service..."
 
 # Create a dedicated systemd config
 ynh_add_systemd_config
 
 #=================================================
-# SECURE FILES AND DIRECTORIES
+# GENERIC FINALIZATION
 #=================================================
+# SETUP LOGROTATE
+#=================================================
+ynh_script_progression --message="Configuring log rotation..."
 
-# Reset permissions
-chown -R root:root "$final_path"
+mkdir -p "/var/log/$app/"
+touch "/var/log/$app/$app.log"
+chown -R $app:$app "/var/log/$app/"
+# Use logrotate to manage application logfile(s)
+ynh_use_logrotate
 
-# Set permissions to app files
-chown -R $app:$app "$final_path/data/"
-chmod -R 750 "$final_path/data/"
+#=================================================
+# INTEGRATE SERVICE IN YUNOHOST
+#=================================================
+ynh_script_progression --message="Integrating service in YunoHost..."
 
-# Set permissions to config file
-chown $app "$final_path/config.ini"
-chmod 600 "$final_path/config.ini"
+yunohost service add $app --log="/var/log/$app/$app.log"
 
 #=================================================
 # START SYSTEMD SERVICE
@@ -200,7 +192,7 @@ chmod 600 "$final_path/config.ini"
 ynh_script_progression --message="Starting a systemd service..."
 
 # Start a systemd service
-ynh_systemd_action --service_name=$app --action="start"
+ynh_systemd_action --service_name=$app --action="start" --log_path=systemd --line_match="Server is ready"
 
 #=================================================
 # RELOAD NGINX
@@ -233,4 +225,4 @@ ynh_send_readme_to_admin "$message"
 # END OF SCRIPT
 #=================================================
 
-ynh_script_progression --message="Installation of $app completed" --last
+ynh_script_progression --message="Installation of $app completed"
