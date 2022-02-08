@@ -6,7 +6,14 @@
         "en": "Personal finance manager",
         "fr": "Outil personnel de gestion de finances"
     },
+    "version": "0.17.4~ynh1",
     "url": "https://framagit.org/kresusapp/kresus",
+    "upstream": {
+        "license": "free",
+        "website": "https://framagit.org/kresusapp/kresus",
+        "demo": "https://kresus.org/en/demo.html",
+        "code": "https://framagit.org/kresusapp/kresus"
+    },
     "license": "AGPL-3.0-only",
     "maintainer": {
         "name": "Nicolas <nicofrand> Frandeboeuf",
@@ -21,13 +28,12 @@
     "requirements": {
         "yunohost": ">= 4.3.0"
     },
-    "version": "0.17.4~ynh1",
     "multi_instance": true,
     "services": [
         "nginx"
     ],
     "arguments": {
-        "install" : [
+        "install": [
             {
                 "name": "domain",
                 "type": "domain"

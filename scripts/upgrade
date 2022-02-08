@@ -10,13 +10,6 @@ source _common.sh
 source /usr/share/yunohost/helpers
 
 #=================================================
-# MANAGE SCRIPT FAILURE
-#=================================================
-
-# Exit if an error occurs during the execution of the script
-ynh_abort_if_errors
-
-#=================================================
 # LOAD SETTINGS
 #=================================================
 ynh_script_progression --message="Loading installation settings..."
@@ -33,8 +26,39 @@ db_user=$db_name
 db_pwd=$(ynh_app_setting_get --app=$app --key=psqlpwd)
 
 #=================================================
+# CHECK VERSION
+#=================================================
+ynh_script_progression --message="Checking version..."
+
+upgrade_type=$(ynh_check_app_version_changed)
+
+#=================================================
+# BACKUP BEFORE UPGRADE THEN ACTIVE TRAP
+#=================================================
+ynh_script_progression --message="Backing up the app before upgrading (may take a while)..."
+
+# Backup the current version of the app
+ynh_backup_before_upgrade
+ynh_clean_setup () {
+	# Restore it if the upgrade fails
+	ynh_restore_upgradebackup
+}
+# Exit if an error occurs during the execution of the script
+ynh_abort_if_errors
+
+#=================================================
+# STANDARD UPGRADE STEPS
+#=================================================
+# STOP SYSTEMD SERVICE
+#=================================================
+ynh_script_progression --message="Stopping a systemd service..."
+
+ynh_systemd_action --service_name=$app --action="stop" --log_path=systemd --line_match="Stopped"
+
+#=================================================
 # ENSURE DOWNWARD COMPATIBILITY
 #=================================================
+ynh_script_progression --message="Ensuring downward compatibility..."
 
 # Previous versions did not set the DB name as a setting, so we need to set it now (will be used on
 # remove).
@@ -65,28 +89,49 @@ then
 fi
 
 #=================================================
-# BACKUP BEFORE UPGRADE THEN ACTIVE TRAP
+# CREATE DEDICATED USER
 #=================================================
-ynh_script_progression --message="Backing up the app"
+ynh_script_progression --message="Making sure dedicated system user exists..."
 
-# Backup the current version of the app
-ynh_backup_before_upgrade
-ynh_clean_setup () {
-	# restore it if the upgrade fails
-	ynh_restore_upgradebackup
-}
-
-# Exit if an error occurs during the execution of the script
-ynh_abort_if_errors
+# Create a dedicated user (if not existing)
+ynh_system_user_create --username=$app --home_dir="$final_path"
 
 #=================================================
-# STANDARD UPGRADE STEPS
+# DOWNLOAD, CHECK AND UNPACK SOURCE
 #=================================================
-# INSTALL DEPENDENCIES
+
+if [ "$upgrade_type" == "UPGRADE_APP" ]
+then
+	ynh_script_progression --message="Upgrading source files..."
+
+	# Download, check integrity, uncompress and patch the source from app.src
+	ynh_setup_source --dest_dir="$final_path"
+
+	if [ -z "$final_path/data" ]
+	then
+		mkdir "$final_path/data"
+	fi
+fi
+
+chmod 750 "$final_path"
+chmod -R o-rwx "$final_path"
+chown -R $app:www-data "$final_path"
+
 #=================================================
-ynh_script_progression --message="Installing app dependencies"
+# NGINX CONFIGURATION
+#=================================================
+ynh_script_progression --message="Upgrading NGINX web server configuration..."
+
+# Create a dedicated NGINX config
+ynh_add_nginx_config
+
+#=================================================
+# UPGRADE DEPENDENCIES
+#=================================================
+ynh_script_progression --message="Upgrading dependencies..."
 
 ynh_exec_warn_less ynh_install_app_dependencies $pkg_dependencies
+ynh_exec_warn_less ynh_install_nodejs --nodejs_version=$nodejs_version
 
 # Now that postgresql is installed, check the db exists and the user is set up
 if [ -z "$db_pwd" ]
@@ -98,45 +143,11 @@ then
 fi
 
 #=================================================
-# DOWNLOAD, CHECK AND UNPACK SOURCE
-#=================================================
-ynh_script_progression --message="Downloading app from sources"
-
-ynh_setup_source --dest_dir="$final_path"
-
-if [ -z "$final_path/data" ]
-then
-	mkdir "$final_path/data"
-fi
-
-#=================================================
-# NGINX CONFIGURATION
-#=================================================
-ynh_script_progression --message="Upgrading NGINX web server configuration..."
-
-# Create a dedicated NGINX config
-ynh_add_nginx_config
-
-#=================================================
-# CREATE DEDICATED USER
-#=================================================
-ynh_script_progression --message="Creating system user"
-
-ynh_system_user_create --username=$app
-
-#=================================================
 # SPECIFIC UPGRADE
 #=================================================
-# Install nodesjs
+# INSTALL WOOB WITH PIP
 #=================================================
-ynh_script_progression --message="Installing nodejs"
-
-ynh_exec_warn_less ynh_install_nodejs --nodejs_version=$nodejs_version
-
-#=================================================
-# Install woob with pip
-#=================================================
-ynh_script_progression --message="Installing woob"
+ynh_script_progression --message="Installing woob..."
 
 ynh_secure_remove --file="${final_path}/venv"
 virtualenv --python=python3 --system-site-packages "${final_path}/venv"
@@ -150,9 +161,9 @@ virtualenv --python=python3 --system-site-packages "${final_path}/venv"
 )
 
 #=================================================
-# Install Kresus with npm
+# INSTALL KRESUS WITH NPM
 #=================================================
-ynh_script_progression --message="Installing app"
+ynh_script_progression --message="Installing app..."
 
 ynh_use_nodejs
 (
@@ -167,66 +178,49 @@ ynh_use_nodejs
 )
 
 #=================================================
-# CONFIGURE KRESUS
+# UPDATE A CONFIG FILE
 #=================================================
+ynh_script_progression --message="Updating a configuration file..."
 
-ynh_backup_if_checksum_is_different "$final_path/config.ini"
+ynh_add_config --template="../conf/config.ini" --destination="$final_path/config.ini"
 
-cp ../conf/config.ini "$final_path/config.ini"
-
-ynh_replace_string --match_string="__PORT__"        --replace_string="$port"       --target_file="$final_path/config.ini"
-ynh_replace_string --match_string="__PATH__"        --replace_string="$path_url"   --target_file="$final_path/config.ini"
-ynh_replace_string --match_string="__FINALPATH__"   --replace_string="$final_path" --target_file="$final_path/config.ini"
-ynh_replace_string --match_string="__SALT__"        --replace_string="$salt"       --target_file="$final_path/config.ini"
-ynh_replace_string --match_string="__APP__"         --replace_string="$app"        --target_file="$final_path/config.ini"
-ynh_replace_string --match_string="__DOMAIN__"      --replace_string="$domain"     --target_file="$final_path/config.ini"
-ynh_replace_string --match_string="__DB_NAME__"     --replace_string="$db_name"    --target_file="$final_path/config.ini"
-ynh_replace_string --match_string="__DB_USER__"     --replace_string="$db_user"    --target_file="$final_path/config.ini"
-ynh_replace_string --match_string="__DB_PASSWORD__" --replace_string="$db_pwd"     --target_file="$final_path/config.ini"
-
-# Calculate and store the config file checksum into the app settings
-ynh_store_file_checksum "$final_path/config.ini"
+chmod 400 "$final_path/config.ini"
+chown $app:$app "$final_path/config.ini"
 
 #=================================================
 # SETUP SYSTEMD
 #=================================================
-
-ynh_replace_string --match_string="__ENV_PATH__" --replace_string="$PATH"                     --target_file="../conf/systemd.service"
-ynh_replace_string --match_string="__NODEPATH__" --replace_string="$(dirname "$nodejs_path")" --target_file="../conf/systemd.service"
+ynh_script_progression --message="Upgrading systemd configuration..."
 
 # Create a dedicated systemd config
-ynh_script_progression --message="Creating systemd configuration"
 ynh_add_systemd_config
 
 #=================================================
 # GENERIC FINALIZATION
 #=================================================
-# SECURE FILES AND DIRECTORIES
+# SETUP LOGROTATE
 #=================================================
+ynh_script_progression --message="Upgrading logrotate configuration..."
 
-# Reset permissions
-chown -R root:root "$final_path"
-
-# Set permissions to app files
-chown -R $app:$app "$final_path/data/"
-chmod -R 750 "$final_path/data/"
-
-# Set permissions to config files
-chown $app "$final_path/config.ini"
-chmod 600 "$final_path/config.ini"
-
-if [ -f "$final_path/data/woob-data/backends" ]
-then
-	chmod 600 "$final_path/data/woob-data/backends"
-fi
+mkdir -p "/var/log/$app/"
+touch "/var/log/$app/$app.log"
+chown -R $app:$app "/var/log/$app/"
+# Use logrotate to manage app-specific logfile(s)
+ynh_use_logrotate --non-append
 
 #=================================================
-# RESTART SYSTEMD SERVICE
+# INTEGRATE SERVICE IN YUNOHOST
 #=================================================
-ynh_script_progression --message="Restarting a systemd service..."
+ynh_script_progression --message="Integrating service in YunoHost..."
 
-# Start a systemd service
-ynh_systemd_action --service_name=$app --action="restart"
+yunohost service add $app --log="/var/log/$app/$app.log"
+
+#=================================================
+# START SYSTEMD SERVICE
+#=================================================
+ynh_script_progression --message="Starting a systemd service..."
+
+ynh_systemd_action --service_name=$app --action="start" --log_path=systemd --line_match="Server is ready"
 
 #=================================================
 # RELOAD NGINX
@@ -258,4 +252,4 @@ ynh_send_readme_to_admin "$message"
 # END OF SCRIPT
 #=================================================
 
-ynh_script_progression --message="Upgrade of $app completed" --last
+ynh_script_progression --message="Upgrade of $app completed"
