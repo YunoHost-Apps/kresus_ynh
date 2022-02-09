@@ -11,7 +11,6 @@
     "upstream": {
         "license": "free",
         "website": "https://framagit.org/kresusapp/kresus",
-        "demo": "https://kresus.org/en/demo.html",
         "code": "https://framagit.org/kresusapp/kresus"
     },
     "license": "AGPL-3.0-only",
