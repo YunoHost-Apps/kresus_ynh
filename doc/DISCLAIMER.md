@@ -1,6 +1,6 @@
 ## Demo
 
-* [Official demo](https://kresus.org/en/demo.html) ⚠️ Don't set up a connection to your bank accounts, or everybody would be able to look at your private bank information!
+* [Official demo](https://kresus.org/en/demo.html) Don't set up a connection to your bank accounts, or everybody would be able to look at your private bank information!
 
 32 bits architectures are not supported because nodejs does not provide builds for 32 bits anymore.
 
