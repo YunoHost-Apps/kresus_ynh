@@ -14,14 +14,36 @@ Restart=always
 StandardOutput=syslog
 StandardError=syslog
 SyslogIdentifier=__APP__
+# /var/log is implied
+LogsDirectory=__APP__
 
-NoNewPrivileges=yes
-PrivateTmp=yes
-PrivateDevices=yes
-ProtectHome=yes
-ProtectSystem=full
-ProtectControlGroups=yes
-ProtectKernelModules=yes
+AmbientCapabilities=
+CapabilityBoundingSet=
+LockPersonality=true
+#Not compatible with NodeJS
+#MemoryDenyWriteExecute=true
+NoNewPrivileges=true
+PrivateDevices=true
+PrivateTmp=true
+PrivateUsers=true
+ProtectClock=true
+ProtectControlGroups=true
+ProtectHome=true
+ProtectHostname=true
+ProtectKernelLogs=true
+ProtectKernelModules=true
+ProtectKernelTunables=true
+ProtectProc=invisible
+ProtectSystem=strict
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6 AF_NETLINK
+RestrictNamespaces=true
+RestrictRealtime=true
+RestrictSUIDSGID=true
+#SecureBits=noroot-locked
+SystemCallArchitectures=native
+SystemCallFilter=@system-service
+SystemCallErrorNumber=EPERM
+
 # to allow this systemd service to use sendmail.
 # references:
 #  https://bugs.archlinux.org/task/57721
