@@ -5,7 +5,7 @@ It shall NOT be edited by hand.
 
 # Kresus pour YunoHost
 
-[![Niveau d'intégration](https://dash.yunohost.org/integration/kresus.svg)](https://dash.yunohost.org/appci/app/kresus) ![Statut du fonctionnement](https://ci-apps.yunohost.org/ci/badges/kresus.status.svg) ![Statut de maintenance](https://ci-apps.yunohost.org/ci/badges/kresus.maintain.svg)
+[![Niveau d'intégration](https://dash.yunohost.org/integration/kresus.svg)](https://dash.yunohost.org/appci/app/kresus) ![Statut du fonctionnement](https://ci-apps.yunohost.org/ci/badges/kresus.status.svg) ![Statut de maintenance](https://ci-apps.yunohost.org/ci/badges/kresus.maintain.svg)  
 [![Installer Kresus avec YunoHost](https://install-app.yunohost.org/install-with-yunohost.svg)](https://install-app.yunohost.org/?app=kresus)
 
 *[Read this readme in english.](./README.md)*
