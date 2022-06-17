@@ -19,7 +19,7 @@ NoNewPrivileges=yes
 PrivateTmp=yes
 PrivateDevices=yes
 ProtectHome=yes
-ProtectSystem=strict
+ProtectSystem=full
 ProtectControlGroups=yes
 ProtectKernelModules=yes
 # to allow this systemd service to use sendmail.
