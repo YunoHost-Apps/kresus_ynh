@@ -135,6 +135,7 @@ virtualenv --python=python3 --system-site-packages "${final_path}/venv"
 	pip install --upgrade pip
 	pip install woob html2text simplejson BeautifulSoup4 PyExecJS typing-extensions pdfminer.six --ignore-installed
 )
+chown -R $app:www-data "$final_path"
 
 #=================================================
 # INTSALL KRESUS WITH NPM
@@ -144,10 +145,9 @@ ynh_script_progression --message="Installing app..."
 ynh_use_nodejs
 (
 	cd "$final_path"
-	chown -R "$app": "$final_path"
-
 	ynh_exec_warn_less $ynh_npm install --production --unsafe-perm
 )
+chown -R $app:www-data "$final_path"
 
 #=================================================
 # ADD A CONFIGURATION
