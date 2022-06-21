@@ -6,7 +6,7 @@
         "en": "Personal finance manager",
         "fr": "Outil personnel de gestion de finances"
     },
-    "version": "0.17.4~ynh2",
+    "version": "0.18.1~ynh3",
     "url": "https://framagit.org/kresusapp/kresus",
     "upstream": {
         "license": "free",

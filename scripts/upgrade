@@ -40,6 +40,7 @@ ynh_script_progression --message="Backing up the app before upgrading (may take 
 # Backup the current version of the app
 ynh_backup_before_upgrade
 ynh_clean_setup () {
+	ynh_clean_check_starting
 	# Restore it if the upgrade fails
 	ynh_restore_upgradebackup
 }
@@ -118,14 +119,6 @@ chmod -R o-rwx "$final_path"
 chown -R $app:www-data "$final_path"
 
 #=================================================
-# NGINX CONFIGURATION
-#=================================================
-ynh_script_progression --message="Upgrading NGINX web server configuration..."
-
-# Create a dedicated NGINX config
-ynh_add_nginx_config
-
-#=================================================
 # UPGRADE DEPENDENCIES
 #=================================================
 ynh_script_progression --message="Upgrading dependencies..."
@@ -143,6 +136,14 @@ then
 fi
 
 #=================================================
+# NGINX CONFIGURATION
+#=================================================
+ynh_script_progression --message="Upgrading NGINX web server configuration..."
+
+# Create a dedicated NGINX config
+ynh_add_nginx_config
+
+#=================================================
 # SPECIFIC UPGRADE
 #=================================================
 # INSTALL WOOB WITH PIP
@@ -157,8 +158,9 @@ virtualenv --python=python3 --system-site-packages "${final_path}/venv"
 	set -o nounset
 
 	pip install --upgrade pip
-	pip install woob html2text simplejson BeautifulSoup4 PyExecJS pdfminer.six --ignore-installed
+	pip install woob html2text simplejson BeautifulSoup4 PyExecJS typing-extensions pdfminer.six --ignore-installed
 )
+chown -R $app:www-data "$final_path"
 
 #=================================================
 # INSTALL KRESUS WITH NPM
@@ -168,7 +170,6 @@ ynh_script_progression --message="Installing app..."
 ynh_use_nodejs
 (
 	cd "$final_path"
-	chown -R $app: "$final_path"
 
 	# In case of nodejs upgrade, remove the current node_modules to make sure there are no errors
 	# linked to modules compiled for the previous version.
@@ -176,6 +177,7 @@ ynh_use_nodejs
 
 	ynh_exec_warn_less $ynh_npm install --production --unsafe-perm
 )
+chown -R $app:www-data "$final_path"
 
 #=================================================
 # UPDATE A CONFIG FILE

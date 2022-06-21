@@ -6,18 +6,44 @@ After=syslog.target network.target
 Type=simple
 User=__APP__
 Group=__APP__
-WorkingDirectory=__FINALPATH__
-Environment="PATH=__YNH_NODE_LOAD_PATH__"
+WorkingDirectory=__FINALPATH__/
+Environment="__YNH_NODE_LOAD_PATH__"
 Environment=NODE_ENV=production
 ExecStart=__FINALPATH__/bin/kresus.js --config __FINALPATH__/config.ini
 Restart=always
+StandardOutput=syslog
+StandardError=syslog
+SyslogIdentifier=__APP__
+# /var/log is implied
+LogsDirectory=__APP__
+
+AmbientCapabilities=
+CapabilityBoundingSet=
+LockPersonality=true
+#Not compatible with NodeJS
+#MemoryDenyWriteExecute=true
 NoNewPrivileges=true
 PrivateDevices=true
 PrivateTmp=true
+PrivateUsers=true
+ProtectClock=true
+ProtectControlGroups=true
 ProtectHome=true
+ProtectHostname=true
+ProtectKernelLogs=true
+ProtectKernelModules=true
+ProtectKernelTunables=true
+ProtectProc=invisible
 ProtectSystem=strict
-ProtectControlGroups=yes
-ProtectKernelModules=yes
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6 AF_NETLINK
+RestrictNamespaces=true
+RestrictRealtime=true
+RestrictSUIDSGID=true
+#SecureBits=noroot-locked
+SystemCallArchitectures=native
+SystemCallFilter=@system-service
+SystemCallErrorNumber=EPERM
+
 # to allow this systemd service to use sendmail.
 # references:
 #  https://bugs.archlinux.org/task/57721
@@ -26,9 +52,6 @@ ProtectKernelModules=yes
 SupplementaryGroups=postdrop
 ReadWritePaths=__FINALPATH__/config.ini __FINALPATH__/data/ /var/spool/postfix/maildrop/
 
-StandardOutput=syslog
-StandardError=syslog
-SyslogIdentifier=__APP__
 
 [Install]
 WantedBy=multi-user.target
