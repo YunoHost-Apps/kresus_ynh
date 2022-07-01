@@ -42,7 +42,7 @@ RestrictRealtime=true
 RestrictSUIDSGID=true
 #SecureBits=noroot-locked
 SystemCallArchitectures=native
-SystemCallFilter=@system-service
+SystemCallFilter=~@clock @debug @module @mount @obsolete @reboot @setuid @swap
 SystemCallErrorNumber=EPERM
 
 # to allow this systemd service to use sendmail.
