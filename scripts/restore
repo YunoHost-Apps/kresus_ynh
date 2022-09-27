@@ -15,7 +15,7 @@ source /usr/share/yunohost/helpers
 #=================================================
 
 ynh_clean_setup () {
-	ynh_clean_check_starting
+	true
 }
 # Exit if an error occurs during the execution of the script
 ynh_abort_if_errors
@@ -23,7 +23,7 @@ ynh_abort_if_errors
 #=================================================
 # LOAD SETTINGS
 #=================================================
-ynh_script_progression --message="Loading installation settings..."
+ynh_script_progression --message="Loading installation settings..." --weight=1
 
 app=$YNH_APP_INSTANCE_NAME
 
@@ -37,11 +37,11 @@ salt=$(ynh_app_setting_get --app=$app --key=salt)
 #=================================================
 # CHECK IF THE APP CAN BE RESTORED
 #=================================================
-ynh_script_progression --message="Validating restoration parameters..."
+ynh_script_progression --message="Validating restoration parameters..." --weight=1
 
 architecture=$YNH_ARCH
 # Check machine architecture (in particular, we don't support ARM and 32bit machines)
-if [ $architecture == "i386" ]
+if [ $YNH_ARCH == "i386" ]
 then
 	ynh_die --message="Sorry, because of nodejs framework, this app can't be installed on i386 (32 bits) machine."
 fi
@@ -54,7 +54,7 @@ test ! -d $final_path \
 #=================================================
 # RECREATE THE DEDICATED USER
 #=================================================
-ynh_script_progression --message="Recreating the dedicated system user..."
+ynh_script_progression --message="Recreating the dedicated system user..." --weight=1
 
 # Create the dedicated user (if not existing)
 ynh_system_user_create --username=$app --home_dir="$final_path"
@@ -62,7 +62,7 @@ ynh_system_user_create --username=$app --home_dir="$final_path"
 #=================================================
 # RESTORE THE APP MAIN DIR
 #=================================================
-ynh_script_progression --message="Restoring the app main directory..."
+ynh_script_progression --message="Restoring the app main directory..." --weight=1
 
 ynh_restore_file --origin_path="$final_path"
 
@@ -78,23 +78,24 @@ chown $app:$app "$final_path/config.ini"
 #=================================================
 # REINSTALL DEPENDENCIES
 #=================================================
-ynh_script_progression --message="Reinstalling dependencies..."
+ynh_script_progression --message="Reinstalling dependencies..." --weight=1
 
 # Define and install dependencies
 ynh_exec_warn_less ynh_install_app_dependencies $pkg_dependencies
 ynh_exec_warn_less ynh_install_nodejs --nodejs_version=$nodejs_version
+ynh_exec_warn_less ynh_install_extra_app_dependencies --repo="deb https://dl.yarnpkg.com/debian/ stable main" --package="yarn" --key="https://dl.yarnpkg.com/debian/pubkey.gpg"
 
 #=================================================
 # RESTORE THE NGINX CONFIGURATION
 #=================================================
-ynh_script_progression --message="Restoring the NGINX web server configuration..."
+ynh_script_progression --message="Restoring the NGINX web server configuration..." --weight=1
 
 ynh_restore_file --origin_path="/etc/nginx/conf.d/$domain.d/$app.conf"
 
 #=================================================
 # RESTORE THE POSTGRESQL DATABASE
 #=================================================
-ynh_script_progression --message="Restoring the PostgreSQL database..."
+ynh_script_progression --message="Restoring the PostgreSQL database..." --weight=1
 
 ynh_psql_test_if_first_run
 db_pwd=$(ynh_app_setting_get --app=$app --key=psqlpwd)
@@ -104,7 +105,7 @@ ynh_psql_execute_file_as_root --file="./db.sql" --database=$db_name
 #=================================================
 # RESTORE SYSTEMD
 #=================================================
-ynh_script_progression --message="Restoring the systemd configuration..."
+ynh_script_progression --message="Restoring the systemd configuration..." --weight=1
 
 ynh_restore_file --origin_path="/etc/systemd/system/$app.service"
 systemctl enable $app.service --quiet
@@ -112,7 +113,7 @@ systemctl enable $app.service --quiet
 #=================================================
 # RESTORE THE LOGROTATE CONFIGURATION
 #=================================================
-ynh_script_progression --message="Restoring the logrotate configuration..."
+ynh_script_progression --message="Restoring the logrotate configuration..." --weight=1
 
 mkdir -p "/var/log/$app/"
 touch "/var/log/$app/$app.log"
@@ -122,14 +123,14 @@ ynh_restore_file --origin_path="/etc/logrotate.d/$app"
 #=================================================
 # INTEGRATE SERVICE IN YUNOHOST
 #=================================================
-ynh_script_progression --message="Integrating service in YunoHost..."
+ynh_script_progression --message="Integrating service in YunoHost..." --weight=1
 
 yunohost service add $app --log="/var/log/$app/$app.log"
 
 #=================================================
 # START SYSTEMD SERVICE
 #=================================================
-ynh_script_progression --message="Starting a systemd service..."
+ynh_script_progression --message="Starting a systemd service..." --weight=1
 
 ynh_systemd_action --service_name=$app --action="start" --log_path=systemd --line_match="Server is ready"
 
@@ -138,7 +139,7 @@ ynh_systemd_action --service_name=$app --action="start" --log_path=systemd --lin
 #=================================================
 # RELOAD NGINX
 #=================================================
-ynh_script_progression --message="Reloading NGINX web server..."
+ynh_script_progression --message="Reloading NGINX web server..." --weight=1
 
 ynh_systemd_action --service_name=nginx --action=reload
 
@@ -146,4 +147,4 @@ ynh_systemd_action --service_name=nginx --action=reload
 # END OF SCRIPT
 #=================================================
 
-ynh_script_progression --message="Restoration completed for $app"
+ynh_script_progression --message="Restoration completed for $app" --last

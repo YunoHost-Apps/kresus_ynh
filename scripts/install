@@ -14,7 +14,7 @@ source /usr/share/yunohost/helpers
 #=================================================
 
 ynh_clean_setup () {
-	ynh_clean_check_starting
+	true
 }
 # Exit if an error occurs during the execution of the script
 ynh_abort_if_errors
@@ -25,7 +25,6 @@ ynh_abort_if_errors
 
 domain=$YNH_APP_ARG_DOMAIN
 path_url=$YNH_APP_ARG_PATH
-architecture=$YNH_ARCH
 
 app=$YNH_APP_INSTANCE_NAME
 
@@ -34,10 +33,10 @@ salt=$(ynh_string_random --length=40)
 #=================================================
 # CHECK IF THE APP CAN BE INSTALLED WITH THESE ARGS
 #=================================================
-ynh_script_progression --message="Validating installation parameters..."
+ynh_script_progression --message="Validating installation parameters..." --weight=1
 
 # Check machine architecture (in particular, we don't support ARM and 32bit machines)
-if [ $architecture == "i386" ];
+if [ $YNH_ARCH == "i386" ];
 then
 	ynh_die --message="Sorry, because of nodejs framework, this app can't be installed on i386 (32 bits) machine."
 fi
@@ -51,7 +50,7 @@ ynh_webpath_register --app=$app --domain=$domain --path_url=$path_url
 #=================================================
 # STORE SETTINGS FROM MANIFEST
 #=================================================
-ynh_script_progression --message="Storing installation settings..."
+ynh_script_progression --message="Storing installation settings..." --weight=1
 
 ynh_app_setting_set --app=$app --key=domain --value=$domain
 ynh_app_setting_set --app=$app --key=path --value=$path_url
@@ -62,7 +61,7 @@ ynh_app_setting_set --app=$app --key=salt --value=$salt
 #=================================================
 # FIND AND OPEN A PORT
 #=================================================
-ynh_script_progression --message="Finding an available port..."
+ynh_script_progression --message="Finding an available port..." --weight=1
 
 # Find an available port
 port=$(ynh_find_port --port=9876)
@@ -71,15 +70,16 @@ ynh_app_setting_set --app=$app --key=port --value=$port
 #=================================================
 # INSTALL DEPENDENCIES
 #=================================================
-ynh_script_progression --message="Installing dependencies..."
+ynh_script_progression --message="Installing dependencies..." --weight=1
 
 ynh_exec_warn_less ynh_install_app_dependencies $pkg_dependencies
 ynh_exec_warn_less ynh_install_nodejs --nodejs_version=$nodejs_version
+ynh_exec_warn_less ynh_install_extra_app_dependencies --repo="deb https://dl.yarnpkg.com/debian/ stable main" --package="yarn" --key="https://dl.yarnpkg.com/debian/pubkey.gpg"
 
 #=================================================
 # CREATE DEDICATED USER
 #=================================================
-ynh_script_progression --message="Configuring system user..."
+ynh_script_progression --message="Configuring system user..." --weight=1
 
 # Create a system user
 ynh_system_user_create --username=$app --home_dir="$final_path"
@@ -87,7 +87,7 @@ ynh_system_user_create --username=$app --home_dir="$final_path"
 #=================================================
 # CREATE A POSTGRESQL DATABASE
 #=================================================
-ynh_script_progression --message="Creating a PostgreSQL database..."
+ynh_script_progression --message="Creating a PostgreSQL database..." --weight=1
 
 db_name=$(ynh_sanitize_dbid --db_name=$app)
 db_user=$db_name
@@ -99,7 +99,7 @@ db_pwd=$(ynh_app_setting_get --app=$app --key=psqlpwd)
 #=================================================
 # DOWNLOAD, CHECK AND UNPACK SOURCE
 #=================================================
-ynh_script_progression --message="Setting up source files..."
+ynh_script_progression --message="Setting up source files..." --weight=1
 
 ynh_app_setting_set --app=$app --key=final_path --value=$final_path
 # Download, check integrity, uncompress and patch the source from app.src
@@ -114,7 +114,7 @@ chown -R $app:www-data "$final_path"
 #=================================================
 # NGINX CONFIGURATION
 #=================================================
-ynh_script_progression --message="Configuring NGINX web server..."
+ynh_script_progression --message="Configuring NGINX web server..." --weight=1
 
 # Create a dedicated NGINX config
 ynh_add_nginx_config
@@ -124,35 +124,41 @@ ynh_add_nginx_config
 #=================================================
 # INSTALL WOOB WITH PIP
 #=================================================
-ynh_script_progression --message="Installing woob..."
+ynh_script_progression --message="Installing woob..." --weight=1
 
-virtualenv --python=python3 --system-site-packages "${final_path}/venv"
+locale-gen C.UTF-8
+update-locale C.UTF-8
+ynh_exec_as $app virtualenv --python=python3 --system-site-packages "${final_path}/venv"
 (
 	set +o nounset
 	source "${final_path}/venv/bin/activate"
 	set -o nounset
 
-	pip install --upgrade pip
-	pip install woob html2text simplejson BeautifulSoup4 PyExecJS typing-extensions pdfminer.six --ignore-installed
+	ynh_exec_warn_less ynh_exec_as $app RUSTUP_HOME="$final_path"/.rustup CARGO_HOME="$final_path"/.cargo bash -c 'curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -q -y'
+	export PATH="$final_path/.cargo/bin:$PATH"
+	ynh_exec_warn_less ynh_exec_as $app env PATH=$PATH pip install --upgrade pip
+	ynh_exec_warn_less ynh_exec_as $app env PATH=$PATH pip install --upgrade setuptools
+	ynh_exec_warn_less ynh_exec_as $app env PATH=$PATH pip install woob simplejson BeautifulSoup4 PyExecJS typing-extensions pdfminer.six Pillow --ignore-installed
+	ynh_secure_remove --file="$final_path/.cargo"
+	ynh_secure_remove --file="$final_path/.rustup"
 )
-chown -R $app:www-data "$final_path"
 
 #=================================================
-# INTSALL KRESUS WITH NPM
+# INSTALL KRESUS WITH NPM
 #=================================================
-ynh_script_progression --message="Installing app..."
+ynh_script_progression --message="Installing app..." --weight=1
 
 ynh_use_nodejs
 (
 	cd "$final_path"
-	ynh_exec_warn_less $ynh_npm install --production --unsafe-perm
+	ynh_exec_warn_less ynh_exec_as $app env $ynh_node_load_PATH yarn
+	ynh_exec_warn_less ynh_exec_as $app env $ynh_node_load_PATH yarn build:prod
 )
-chown -R $app:www-data "$final_path"
 
 #=================================================
 # ADD A CONFIGURATION
 #=================================================
-ynh_script_progression --message="Adding a configuration file..."
+ynh_script_progression --message="Adding a configuration file..." --weight=1
 
 ynh_add_config --template="../conf/config.ini" --destination="$final_path/config.ini"
 
@@ -162,7 +168,7 @@ chown $app:$app "$final_path/config.ini"
 #=================================================
 # SETUP SYSTEMD
 #=================================================
-ynh_script_progression --message="Configuring a systemd service..."
+ynh_script_progression --message="Configuring a systemd service..." --weight=1
 
 # Create a dedicated systemd config
 ynh_add_systemd_config
@@ -172,7 +178,7 @@ ynh_add_systemd_config
 #=================================================
 # SETUP LOGROTATE
 #=================================================
-ynh_script_progression --message="Configuring log rotation..."
+ynh_script_progression --message="Configuring log rotation..." --weight=1
 
 mkdir -p "/var/log/$app/"
 touch "/var/log/$app/$app.log"
@@ -183,14 +189,14 @@ ynh_use_logrotate
 #=================================================
 # INTEGRATE SERVICE IN YUNOHOST
 #=================================================
-ynh_script_progression --message="Integrating service in YunoHost..."
+ynh_script_progression --message="Integrating service in YunoHost..." --weight=1
 
 yunohost service add $app --log="/var/log/$app/$app.log"
 
 #=================================================
 # START SYSTEMD SERVICE
 #=================================================
-ynh_script_progression --message="Starting a systemd service..."
+ynh_script_progression --message="Starting a systemd service..." --weight=1
 
 # Start a systemd service
 ynh_systemd_action --service_name=$app --action="start" --log_path=systemd --line_match="Server is ready"
@@ -198,13 +204,14 @@ ynh_systemd_action --service_name=$app --action="start" --log_path=systemd --lin
 #=================================================
 # RELOAD NGINX
 #=================================================
-ynh_script_progression --message="Reloading NGINX web server..."
+ynh_script_progression --message="Reloading NGINX web server..." --weight=1
 
 ynh_systemd_action --service_name=nginx --action=reload
 
 #=================================================
 # SEND README TO ADMIN
 #=================================================
+ynh_script_progression --message="Sending ReadMe to admin..." --weight=1
 
 message="
 Domain: $domain
@@ -226,4 +233,4 @@ ynh_send_readme_to_admin "$message"
 # END OF SCRIPT
 #=================================================
 
-ynh_script_progression --message="Installation of $app completed"
+ynh_script_progression --message="Installation of $app completed" --last
