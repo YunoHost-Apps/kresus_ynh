@@ -141,6 +141,8 @@ ynh_exec_as $app virtualenv --python=python3 --system-site-packages "${final_pat
 	ynh_exec_warn_less ynh_exec_as $app env PATH=$PATH pip install woob simplejson BeautifulSoup4 PyExecJS typing-extensions pdfminer.six Pillow --ignore-installed
 	ynh_secure_remove --file="$final_path/.cargo"
 	ynh_secure_remove --file="$final_path/.rustup"
+	ynh_secure_remove --file="$final_path/.cache"
+	ynh_secure_remove --file="$final_path/.local"
 )
 
 #=================================================
@@ -151,8 +153,11 @@ ynh_script_progression --message="Installing app..." --weight=1
 ynh_use_nodejs
 (
 	cd "$final_path"
-	ynh_exec_warn_less ynh_exec_as $app env $ynh_node_load_PATH yarn
+	ynh_exec_warn_less ynh_exec_as $app env $ynh_node_load_PATH yarn install
 	ynh_exec_warn_less ynh_exec_as $app env $ynh_node_load_PATH yarn build:prod
+	ynh_exec_warn_less ynh_exec_as $app env $ynh_node_load_PATH yarn cache clean --all
+	ynh_secure_remove --file="$final_path/.cache"
+	ynh_secure_remove --file="$final_path/.yarn"
 )
 
 #=================================================

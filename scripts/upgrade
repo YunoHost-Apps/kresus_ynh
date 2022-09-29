@@ -109,7 +109,7 @@ then
 	ynh_secure_remove --file="$final_path/build"
 
 	# Download, check integrity, uncompress and patch the source from app.src
-	ynh_setup_source --dest_dir="$final_path"
+	ynh_setup_source --dest_dir="$final_path" --keep="config.ini"
 
 	if [ -z "$final_path/data" ]
 	then
@@ -170,6 +170,8 @@ ynh_exec_as $app virtualenv --python=python3 --system-site-packages "${final_pat
 	ynh_exec_warn_less ynh_exec_as $app env PATH=$PATH pip install woob simplejson BeautifulSoup4 PyExecJS typing-extensions pdfminer.six Pillow --ignore-installed
 	ynh_secure_remove --file="$final_path/.cargo"
 	ynh_secure_remove --file="$final_path/.rustup"
+	ynh_secure_remove --file="$final_path/.cache"
+	ynh_secure_remove --file="$final_path/.local"
 )
 
 #=================================================
@@ -185,8 +187,11 @@ ynh_use_nodejs
 	# linked to modules compiled for the previous version.
 	ynh_secure_remove --file="$final_path/node_modules"
 
-	ynh_exec_warn_less ynh_exec_as $app env $ynh_node_load_PATH yarn
+	ynh_exec_warn_less ynh_exec_as $app env $ynh_node_load_PATH yarn install
 	ynh_exec_warn_less ynh_exec_as $app env $ynh_node_load_PATH yarn build:prod
+	ynh_exec_warn_less ynh_exec_as $app env $ynh_node_load_PATH yarn cache clean --all
+	ynh_secure_remove --file="$final_path/.cache"
+	ynh_secure_remove --file="$final_path/.yarn"
 )
 
 #=================================================
