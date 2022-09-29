@@ -156,6 +156,7 @@ ynh_script_progression --message="Installing woob..." --weight=1
 
 locale-gen C.UTF-8
 update-locale C.UTF-8
+ynh_secure_remove --file="${final_path}/venv"
 ynh_exec_as $app virtualenv --python=python3 --system-site-packages "${final_path}/venv"
 (
 	set +o nounset
