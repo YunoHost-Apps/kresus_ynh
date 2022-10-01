@@ -107,17 +107,17 @@ if [ "$upgrade_type" == "UPGRADE_APP" ]
 then
 	ynh_script_progression --message="Upgrading source files..." --weight=1
 
-	# Remove previous build files to ensure there is no conflict (obsolete helpers.js file
-	# called instead of helpers/index.js for ex.)
-	ynh_secure_remove --file="$final_path/build"
+	tmpdir="$(mktemp -d)"
+	cp "$final_path/config.ini" "$tmpdir/config.ini"
+	ynh_secure_remove --file="$final_path"
 
 	# Download, check integrity, uncompress and patch the source from app.src
-	ynh_setup_source --dest_dir="$final_path" --keep="config.ini"
+	ynh_setup_source --dest_dir="$final_path"
 
-	if [ -z "$final_path/data" ]
-	then
-		mkdir "$final_path/data"
-	fi
+	cp "$tmpdir/config.ini" "$final_path/config.ini"
+	ynh_secure_remove --file="$tmpdir"
+
+	mkdir -p "$final_path/data"
 fi
 
 chmod 750 "$final_path"
