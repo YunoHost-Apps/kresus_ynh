@@ -115,6 +115,7 @@ fi
 ynh_script_progression --message="Updating a configuration file..." --weight=1
 
 domain=$new_domain
+path=$new_path
 ynh_add_config --template="../conf/config.ini" --destination="$final_path/config.ini"
 
 chmod 400 "$final_path/config.ini"
