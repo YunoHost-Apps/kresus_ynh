@@ -89,7 +89,6 @@ then
 fi
 
 usermod -d $final_path $app
-ynh_secure_remove --file="/home/$app"
 
 #=================================================
 # CREATE DEDICATED USER
