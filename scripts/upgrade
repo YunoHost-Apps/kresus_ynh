@@ -88,6 +88,8 @@ then
 	ynh_app_setting_set "$app" salt "$salt"
 fi
 
+usermod -d $final_path $app
+
 #=================================================
 # CREATE DEDICATED USER
 #=================================================
