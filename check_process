@@ -12,10 +12,12 @@
 		upgrade=1
 		# 0.16.0~ynh4
 		upgrade=1	from_commit=bd7259e916130f933f6ecdc8d6362e1fa7164d8f
+		# 0.18.1~ynh6
+		upgrade=1	from_commit=c5d4c9a728365771f5536bdac3830b86d75d895a
 		backup_restore=1
 		multi_instance=1
 		port_already_use=0
-		change_url=0
+		change_url=1
 ;;; Options
 Email=
-Notification=all
+Notification=none
