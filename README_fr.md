@@ -5,23 +5,24 @@ It shall NOT be edited by hand.
 
 # Kresus pour YunoHost
 
-[![Niveau d'intégration](https://dash.yunohost.org/integration/kresus.svg)](https://dash.yunohost.org/appci/app/kresus) ![Statut du fonctionnement](https://ci-apps.yunohost.org/ci/badges/kresus.status.svg) ![Statut de maintenance](https://ci-apps.yunohost.org/ci/badges/kresus.maintain.svg)  
+[![Niveau d’intégration](https://dash.yunohost.org/integration/kresus.svg)](https://dash.yunohost.org/appci/app/kresus) ![Statut du fonctionnement](https://ci-apps.yunohost.org/ci/badges/kresus.status.svg) ![Statut de maintenance](https://ci-apps.yunohost.org/ci/badges/kresus.maintain.svg)
+
 [![Installer Kresus avec YunoHost](https://install-app.yunohost.org/install-with-yunohost.svg)](https://install-app.yunohost.org/?app=kresus)
 
 *[Read this readme in english.](./README.md)*
 
-> *Ce package vous permet d'installer Kresus rapidement et simplement sur un serveur YunoHost.
-Si vous n'avez pas YunoHost, regardez [ici](https://yunohost.org/#/install) pour savoir comment l'installer et en profiter.*
+> *Ce package vous permet d’installer Kresus rapidement et simplement sur un serveur YunoHost.
+Si vous n’avez pas YunoHost, regardez [ici](https://yunohost.org/#/install) pour savoir comment l’installer et en profiter.*
 
-## Vue d'ensemble
+## Vue d’ensemble
 
 Kresus est un gestionnaire de finances personnelles gratuit et libre qui tourne sur votre serveur. Il récupère automatiquement et quotidiennement toutes vos nouvelles transactions bancaires et vous permet de les catégoriser, étudier via des graphiques, et établir un budget.
 
 **Version incluse :** 0.19.0~ynh1
 
-## Captures d'écran
+## Captures d’écran
 
-![Capture d'écran de Kresus](./doc/screenshots/screenshot.png)
+![Capture d’écran de Kresus](./doc/screenshots/screenshot.png)
 
 ## Avertissements / informations importantes
 
@@ -52,9 +53,9 @@ Les architectures 32 bits ne sont pas prises en charge car nodejs ne fournit plu
 
 ## Documentations et ressources
 
-* Site officiel de l'app : <https://framagit.org/kresusapp/kresus>
-* Documentation officielle de l'admin : <https://kresus.org/en/doc.html>
-* Dépôt de code officiel de l'app : <https://framagit.org/kresusapp/kresus>
+* Site officiel de l’app : <https://framagit.org/kresusapp/kresus>
+* Documentation officielle de l’admin : <https://kresus.org/en/doc.html>
+* Dépôt de code officiel de l’app : <https://framagit.org/kresusapp/kresus>
 * Documentation YunoHost pour cette app : <https://yunohost.org/app_kresus>
 * Signaler un bug : <https://github.com/YunoHost-Apps/kresus_ynh/issues>
 
@@ -70,4 +71,4 @@ ou
 sudo yunohost app upgrade kresus -u https://github.com/YunoHost-Apps/kresus_ynh/tree/testing --debug
 ```
 
-**Plus d'infos sur le packaging d'applications :** <https://yunohost.org/packaging_apps>
+**Plus d’infos sur le packaging d’applications :** <https://yunohost.org/packaging_apps>
