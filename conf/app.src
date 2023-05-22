@@ -1,7 +1,0 @@
-SOURCE_URL=https://framagit.org/kresusapp/kresus/-/archive/0.19.4/kresus-0.19.4.tar.bz2
-SOURCE_SUM=c168beaa37194f9e89c5f89bb163ea77dec8d7ce13fd1517e5c8d2b00a6234a9
-SOURCE_SUM_PRG=sha256sum
-SOURCE_FORMAT=tar.bz2
-SOURCE_IN_SUBDIR=true
-SOURCE_FILENAME=
-SOURCE_EXTRACT=true

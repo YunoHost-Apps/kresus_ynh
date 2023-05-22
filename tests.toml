@@ -1,0 +1,9 @@
+test_format = 1.0
+
+[default]
+
+    # -------------------------------
+    # Commits to test upgrade from
+    # -------------------------------
+
+    test_upgrade_from.c5d4c9a728365771f5536bdac3830b86d75d895a.name = "Upgrade from 0.18.1~ynh6"
