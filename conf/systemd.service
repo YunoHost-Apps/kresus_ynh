@@ -1,15 +1,15 @@
 [Unit]
-Description=__APP__
+Description=__APP__: personal finance manager
 After=syslog.target network.target
 
 [Service]
 Type=simple
 User=__APP__
 Group=__APP__
-WorkingDirectory=__FINALPATH__/
+WorkingDirectory=__INSTALL_DIR__/
 Environment="__YNH_NODE_LOAD_PATH__"
 Environment=NODE_ENV=production
-ExecStart=__FINALPATH__/bin/kresus.js --config __FINALPATH__/config.ini
+ExecStart=__INSTALL_DIR__/bin/kresus.js --config __INSTALL_DIR__/config.ini
 Restart=always
 StandardOutput=syslog
 StandardError=syslog
@@ -29,7 +29,8 @@ PrivateTmp=true
 PrivateUsers=false
 ProtectClock=true
 ProtectControlGroups=true
-ProtectHome=true
+# See https://github.com/systemd/systemd/issues/7153
+ProtectHome=false
 ProtectHostname=true
 ProtectKernelLogs=true
 ProtectKernelModules=true
@@ -44,14 +45,7 @@ RestrictSUIDSGID=true
 SystemCallArchitectures=native
 SystemCallFilter=~@clock @debug @module @mount @obsolete @reboot @setuid @swap
 SystemCallErrorNumber=EPERM
-
-# to allow this systemd service to use sendmail.
-# references:
-#  https://bugs.archlinux.org/task/57721
-#  https://linux.m2osw.com/snapwebsites-postfixpostdrop18189-warning-mailqueueenter-create-file-maildrop25937318189-permission
-# Future wait for this ticket to be resolved: https://github.com/YunoHost/issues/issues/947
-SupplementaryGroups=postdrop
-ReadWritePaths=__FINALPATH__/config.ini __FINALPATH__/data/ /var/spool/postfix/maildrop/
+ReadWritePaths=__DATA_DIR__
 
 
 [Install]
