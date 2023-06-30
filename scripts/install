@@ -134,7 +134,7 @@ ynh_exec_as $app virtualenv --python=python3 --system-site-packages "${final_pat
 	source "${final_path}/venv/bin/activate"
 	set -o nounset
 
-	ynh_exec_warn_less ynh_exec_as $app RUSTUP_HOME="$final_path"/.rustup CARGO_HOME="$final_path"/.cargo bash -c 'curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -q -y'
+	ynh_exec_warn_less ynh_exec_as $app RUSTUP_HOME="$final_path"/.rustup CARGO_HOME="$final_path"/.cargo bash -c 'curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- --default-toolchain stable-arm-unknown-linux-gnueabihf -q -y'
 	export PATH="$final_path/.cargo/bin:$PATH"
 	ynh_exec_warn_less ynh_exec_as $app env PATH=$PATH pip install --upgrade pip
 	ynh_exec_warn_less ynh_exec_as $app env PATH=$PATH pip install --upgrade setuptools
