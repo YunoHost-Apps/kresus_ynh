@@ -5,7 +5,8 @@ It shall NOT be edited by hand.
 
 # Kresus for YunoHost
 
-[![Integration level](https://dash.yunohost.org/integration/kresus.svg)](https://dash.yunohost.org/appci/app/kresus) ![Working status](https://ci-apps.yunohost.org/ci/badges/kresus.status.svg) ![Maintenance status](https://ci-apps.yunohost.org/ci/badges/kresus.maintain.svg)  
+[![Integration level](https://dash.yunohost.org/integration/kresus.svg)](https://dash.yunohost.org/appci/app/kresus) ![Working status](https://ci-apps.yunohost.org/ci/badges/kresus.status.svg) ![Maintenance status](https://ci-apps.yunohost.org/ci/badges/kresus.maintain.svg)
+
 [![Install Kresus with YunoHost](https://install-app.yunohost.org/install-with-yunohost.svg)](https://install-app.yunohost.org/?app=kresus)
 
 *[Lire ce readme en français.](./README_fr.md)*
@@ -56,7 +57,6 @@ Kresus is an open-source libre self-hosted personal finance manager. It allows y
 * Official app website: <https://framagit.org/kresusapp/kresus>
 * Official admin documentation: <https://kresus.org/en/doc.html>
 * Upstream app code repository: <https://framagit.org/kresusapp/kresus>
-* YunoHost documentation for this app: <https://yunohost.org/app_kresus>
 * Report a bug: <https://github.com/YunoHost-Apps/kresus_ynh/issues>
 
 ## Developer info
