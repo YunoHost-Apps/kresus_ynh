@@ -57,7 +57,6 @@ Kresus is an open-source libre self-hosted personal finance manager. It allows y
 * Official app website: <https://framagit.org/kresusapp/kresus>
 * Official admin documentation: <https://kresus.org/en/doc.html>
 * Upstream app code repository: <https://framagit.org/kresusapp/kresus>
-* YunoHost documentation for this app: <https://yunohost.org/app_kresus>
 * Report a bug: <https://github.com/YunoHost-Apps/kresus_ynh/issues>
 
 ## Developer info
