@@ -5,7 +5,7 @@
 #=================================================
 
 # dependencies used by the app (must be on a single line)
-pkg_dependencies="locales git python3 python3-dev python3-pip python3-selenium libffi-dev libxml2-dev libxslt-dev libyaml-dev libtiff-dev libjpeg-dev libopenjp2-7-dev zlib1g-dev libfreetype6-dev libwebp-dev build-essential gcc g++ wget unzip mupdf-tools libnss3-tools python3-nss virtualenv postgresql"
+pkg_dependencies="locales git python3 python3-dev python3-pip python3-selenium python3-josepy libffi-dev libxml2-dev libxslt-dev libyaml-dev libtiff-dev libjpeg-dev libopenjp2-7-dev zlib1g-dev libfreetype6-dev libwebp-dev build-essential gcc g++ wget unzip mupdf-tools libnss3-tools python3-nss virtualenv postgresql"
 
 nodejs_version=16
 
