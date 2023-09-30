@@ -19,7 +19,7 @@ If you don't have YunoHost, please consult [the guide](https://yunohost.org/#/in
 Kresus is an open-source libre self-hosted personal finance manager. It allows you to safely track your banking history, check your overall balance and know exactly how you are spending money using categories!
 
 
-**Shipped version:** 0.19.4~ynh3
+**Shipped version:** 0.19.4~ynh4
 
 ## Screenshots
 
@@ -57,7 +57,6 @@ Kresus is an open-source libre self-hosted personal finance manager. It allows y
 * Official app website: <https://framagit.org/kresusapp/kresus>
 * Official admin documentation: <https://kresus.org/en/doc.html>
 * Upstream app code repository: <https://framagit.org/kresusapp/kresus>
-* YunoHost documentation for this app: <https://yunohost.org/app_kresus>
 * Report a bug: <https://github.com/YunoHost-Apps/kresus_ynh/issues>
 
 ## Developer info
