@@ -2,7 +2,7 @@
 
 * [Démo officielle](https://kresus.org/fr/demo.html) Ne créez pas une connexion à vos comptes bancaires, ou bien tout le monde pourra voir vos données bancaires privées !
 
-Les architectures 32 bits ne sont pas prises en charge car nodejs ne fournit plus d'archives pour systèmes 32 bits.does not provide builds for 32 bits anymore.
+Les architectures 32 bits ne sont pas prises en charge car nodejs ne fournit plus d'archives pour systèmes 32 bits.
 
 ## Limitations
 
