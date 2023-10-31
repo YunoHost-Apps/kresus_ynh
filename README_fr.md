@@ -56,6 +56,7 @@ Les architectures 32 bits ne sont pas prises en charge car nodejs ne fournit plu
 * Site officiel de l’app : <https://framagit.org/kresusapp/kresus>
 * Documentation officielle de l’admin : <https://kresus.org/en/doc.html>
 * Dépôt de code officiel de l’app : <https://framagit.org/kresusapp/kresus>
+* YunoHost Store: <https://apps.yunohost.org/app/kresus>
 * Signaler un bug : <https://github.com/YunoHost-Apps/kresus_ynh/issues>
 
 ## Informations pour les développeurs
