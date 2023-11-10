@@ -4,7 +4,5 @@
 
 ## Roadmap
 
-* to be added:
-  * [ ] URL cannot be changed
-  * [ ] Improve log file and add logrotate
-  * [ ] Add user who will access the app (by default every one has access to the installed app)
+* To be added:
+  * [ ] Add a user who will access the app (by default every one has access to the installed app)
