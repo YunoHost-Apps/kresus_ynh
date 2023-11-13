@@ -39,8 +39,6 @@ if [ -z "${salt:-}" ]; then
 	ynh_app_setting_set --app=$app --key=salt --value=$salt
 fi
 
-usermod -d $install_dir $app
-
 #=================================================
 # DOWNLOAD, CHECK AND UNPACK SOURCE
 #=================================================
