@@ -28,10 +28,9 @@ Kresus est un gestionnaire de finances personnelles gratuit et libre qui tourne 
 
 ## Documentations et ressources
 
-* Site officiel de l’app : <https://framagit.org/kresusapp/kresus>
+* Site officiel de l’app : <https://kresus.org>
 * Documentation officielle de l’admin : <https://kresus.org/en/doc.html>
 * Dépôt de code officiel de l’app : <https://framagit.org/kresusapp/kresus>
-* YunoHost Store: <https://apps.yunohost.org/app/kresus>
 * YunoHost Store: <https://apps.yunohost.org/app/kresus>
 * Signaler un bug : <https://github.com/YunoHost-Apps/kresus_ynh/issues>
 
