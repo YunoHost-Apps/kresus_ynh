@@ -5,7 +5,7 @@ name = "Kresus"
 description.en = "Personal finance manager"
 description.fr = "Outil personnel de gestion de finances"
 
-version = "0.20.1~ynh1"
+version = "0.20.1~ynh2"
 
 maintainers = ["Nicolas <nicofrand> Frandeboeuf"]
 
@@ -20,8 +20,11 @@ code = "https://framagit.org/kresusapp/kresus"
 yunohost = ">= 11.2"
 architectures = ["amd64", "arm64"]
 multi_instance = true
+
 ldap = false
+
 sso = false
+
 disk = "50M"
 ram.build = "50M"
 ram.runtime = "50M"
