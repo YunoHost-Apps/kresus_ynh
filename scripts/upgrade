@@ -120,7 +120,6 @@ pushd $install_dir
 	ynh_secure_remove --file="$install_dir/node_modules"
 
 	ynh_exec_warn_less ynh_exec_as $app env $ynh_node_load_PATH yarn install --production
-	ynh_exec_warn_less ynh_exec_as $app env $ynh_node_load_PATH yarn install --production
 	ynh_exec_warn_less ynh_exec_as $app env $ynh_node_load_PATH yarn cache clean --all
 	ynh_secure_remove --file="$install_dir/.cache"
 	ynh_secure_remove --file="$install_dir/.yarn"
