@@ -45,6 +45,7 @@ ram.runtime = "50M"
     [resources.sources.main]
     url = "https://framagit.org/kresusapp/kresus/-/archive/0.20.1/kresus-0.20.1.tar.bz2"
     sha256 = "37debb77fae58f28b7343d8e3a4076e96b6a9b181312d2cd523bafa60c211eb2"
+    autoupdate.strategy = "latest_gitlab_tag"
 
     [resources.ports]
 
