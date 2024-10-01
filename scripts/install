@@ -46,9 +46,13 @@ yunohost service add $app --description="Personal finance manager" --log="/var/l
 #=================================================
 ynh_script_progression "Installing woob..."
 
-locale-gen C.UTF-8
-update-locale C.UTF-8
+# The CI will fail on these, even though the locales package is installed.
+if ! [ ${PACKAGE_CHECK_EXEC:-0} -eq 1 ]; then
+	locale-gen C.UTF-8
+	update-locale C.UTF-8
+fi
 ynh_exec_as_app virtualenv --python=python3 --system-site-packages "${install_dir}/venv"
+
 (
 	set +o nounset
 	source "${install_dir}/venv/bin/activate"
