@@ -7,7 +7,7 @@ Type=simple
 User=__APP__
 Group=__APP__
 WorkingDirectory=__INSTALL_DIR__/
-Environment="__YNH_NODE_LOAD_PATH__"
+Environment="PATH=__PATH_WITH_NODEJS__"
 Environment=NODE_ENV=production
 ExecStart=__INSTALL_DIR__/bin/kresus.js --config __INSTALL_DIR__/config.ini
 Restart=always
