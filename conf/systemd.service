@@ -17,36 +17,36 @@ SyslogIdentifier=__APP__
 # /var/log is implied
 LogsDirectory=__APP__
 
-AmbientCapabilities=
-CapabilityBoundingSet=
-LockPersonality=true
 #Not compatible with NodeJS
-#MemoryDenyWriteExecute=true
-NoNewPrivileges=true
-PrivateDevices=true
-PrivateTmp=true
-# PrivateUsers=true does not work on Debian 11
+#MemoryDenyWriteExecute=yes
+NoNewPrivileges=yes
+PrivateTmp=yes
+PrivateDevices=yes
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6 AF_NETLINK
+RestrictNamespaces=yes
+RestrictRealtime=yes
+# PrivateUsers=yes does not work on Debian 11
 PrivateUsers=false
-ProtectClock=true
-ProtectControlGroups=true
+ProtectClock=yes
+ProtectHostname=yes
+ProtectProc=invisible
+ProtectControlGroups=yes
 # See https://github.com/systemd/systemd/issues/7153
 ProtectHome=false
-ProtectHostname=true
-ProtectKernelLogs=true
-ProtectKernelModules=true
-ProtectKernelTunables=true
-ProtectProc=invisible
+ProtectKernelLogs=yes
+ProtectKernelModules=yes
+ProtectKernelTunables=yes
+LockPersonality=yes
 ProtectSystem=strict
-RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6 AF_NETLINK
-RestrictNamespaces=true
-RestrictRealtime=true
-RestrictSUIDSGID=true
+RestrictSUIDSGID=yes
 #SecureBits=noroot-locked
 SystemCallArchitectures=native
 SystemCallFilter=~@clock @debug @module @mount @obsolete @reboot @setuid @swap
 SystemCallErrorNumber=EPERM
 ReadWritePaths=__DATA_DIR__
 
+AmbientCapabilities=
+CapabilityBoundingSet=
 
 [Install]
 WantedBy=multi-user.target
