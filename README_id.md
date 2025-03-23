@@ -21,7 +21,7 @@ Ini TIDAK boleh diedit dengan tangan.
 Kresus is an open-source libre self-hosted personal finance manager. It allows you to safely track your banking history, check your overall balance and know exactly how you are spending money using categories!
 
 
-**Versi terkirim:** 0.22.1~ynh1
+**Versi terkirim:** 0.22.1~ynh2
 
 **Demo:** <https://kresus.org/en/demo.html>
 
