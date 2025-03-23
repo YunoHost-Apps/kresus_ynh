@@ -7,7 +7,7 @@ name = "Kresus"
 description.en = "Personal finance manager"
 description.fr = "Outil personnel de gestion de finances"
 
-version = "0.22.1~ynh1"
+version = "0.22.1~ynh2"
 
 maintainers = ["Nicolas <nicofrand> Frandeboeuf"]
 
