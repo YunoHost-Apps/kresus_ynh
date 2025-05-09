@@ -1,3 +1,5 @@
+#:schema https://raw.githubusercontent.com/YunoHost/apps/master/schemas/manifest.v2.schema.json
+
 packaging_format = 2
 
 id = "kresus"
@@ -5,7 +7,7 @@ name = "Kresus"
 description.en = "Personal finance manager"
 description.fr = "Outil personnel de gestion de finances"
 
-version = "0.21.2~ynh2"
+version = "0.22.1~ynh2"
 
 maintainers = ["Nicolas <nicofrand> Frandeboeuf"]
 
@@ -44,11 +46,9 @@ ram.runtime = "50M"
 
 [resources]
     [resources.sources.main]
-    url = "https://framagit.org/kresusapp/kresus/-/archive/0.21.2/kresus-0.21.2.tar.bz2"
-    sha256 = "36948fe461ae224873accfcf501c02e15a5c4e2c24ca6d989b0af24faa6c5388"
+    url = "https://framagit.org/kresusapp/kresus/-/archive/0.22.1/kresus-0.22.1.tar.bz2"
+    sha256 = "133e8fc0622c53be62d0091c73cdd66057e1fd94deac8ba486f40296982f2ebb"
     autoupdate.strategy = "latest_gitlab_tag"
-
-    [resources.ports]
 
     [resources.system_user]
     allow_email = true
@@ -60,6 +60,8 @@ ram.runtime = "50M"
 
     [resources.permissions]
     main.url = "/"
+
+    [resources.ports]
 
     [resources.apt]
     packages = "locales, git, python3, python3-dev, python3-pip, python3-selenium, python3-josepy, libffi-dev, libxml2-dev, libxslt-dev, libyaml-dev, libtiff-dev, libjpeg-dev, libopenjp2-7-dev, zlib1g-dev, libfreetype6-dev, libwebp-dev, build-essential, gcc, g++, wget, unzip, mupdf-tools, libnss3-tools, python3-nss, virtualenv, postgresql"
