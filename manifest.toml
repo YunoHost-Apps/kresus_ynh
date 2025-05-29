@@ -19,7 +19,8 @@ admindoc = "https://kresus.org/en/doc.html"
 code = "https://framagit.org/kresusapp/kresus"
 
 [integration]
-yunohost = ">= 11.2"
+yunohost = ">= 12.0.9"
+helpers_version = "2.1"
 architectures = ["amd64", "arm64"]
 multi_instance = true
 
@@ -53,6 +54,7 @@ ram.runtime = "50M"
     allow_email = true
 
     [resources.install_dir]
+    group = "www-data:r-x"
 
     [resources.data_dir]
 
