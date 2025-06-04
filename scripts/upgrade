@@ -1,92 +1,62 @@
 #!/bin/bash
 
-#=================================================
-# GENERIC START
-#=================================================
-# IMPORT GENERIC HELPERS
-#=================================================
-
 source _common.sh
 source /usr/share/yunohost/helpers
 
 #=================================================
-# CHECK VERSION
-#=================================================
-
-upgrade_type=$(ynh_check_app_version_changed)
-
-#=================================================
-# STANDARD UPGRADE STEPS
-#=================================================
 # STOP SYSTEMD SERVICE
 #=================================================
-ynh_script_progression --message="Stopping a systemd service..." --weight=1
+ynh_script_progression "Stopping $app's systemd service..."
 
-ynh_systemd_action --service_name=$app --action="stop" --log_path=systemd
+ynh_systemctl --service=$app --action="stop" --log_path=systemd
 
 #=================================================
 # ENSURE DOWNWARD COMPATIBILITY
 #=================================================
-ynh_script_progression --message="Ensuring downward compatibility..." --weight=1
+ynh_script_progression "Ensuring downward compatibility..."
 
 if [ -d "/home/ynh$app" ]; then
 	mv "/home/ynh$app/data" "$install_dir/data"
-	ynh_secure_remove --file="/home/ynh$app"
+	ynh_safe_rm "/home/ynh$app"
 fi
 
-if [ -z "${salt:-}" ]; then
-	salt=$(ynh_string_random 40)
-	ynh_app_setting_set --app=$app --key=salt --value=$salt
-fi
+ynh_app_setting_set_default --key=salt --value=$(ynh_string_random --length=40)
 
 #=================================================
 # DOWNLOAD, CHECK AND UNPACK SOURCE
 #=================================================
+ynh_script_progression "Upgrading source files..."
 
-if [ "$upgrade_type" == "UPGRADE_APP" ]
-then
-	ynh_script_progression --message="Upgrading source files..." --weight=1
-
-	# Download, check integrity, uncompress and patch the source from app.src
-	ynh_setup_source --dest_dir="$install_dir" --keep="config.ini"
-fi
-
-chmod -R o-rwx "$install_dir"
-chown -R $app:www-data "$install_dir"
+ynh_setup_source --dest_dir="$install_dir" --keep="config.ini"
 
 #=================================================
 # UPGRADE DEPENDENCIES
 #=================================================
-ynh_script_progression --message="Upgrading dependencies..." --weight=1
+ynh_script_progression "Upgrading dependencies..."
 
-ynh_exec_warn_less ynh_install_nodejs --nodejs_version=$nodejs_version
+ynh_nodejs_install
 
 #=================================================
 # REAPPLY SYSTEM CONFIGURATIONS
 #=================================================
-ynh_script_progression --message="Upgrading system configurations related to $app..." --weight=1
+ynh_script_progression "Upgrading system configurations related to $app..."
 
-# Create a dedicated NGINX config
-ynh_add_nginx_config
+ynh_config_add_nginx
 
-# Create a dedicated systemd config
-ynh_add_systemd_config
+ynh_config_add_systemd
 
 mkdir -p "/var/log/$app/"
 touch "/var/log/$app/$app.log"
 chown -R $app:$app "/var/log/$app/"
 
-# Use logrotate to manage app-specific logfile(s)
-ynh_use_logrotate --non-append
+ynh_config_add_logrotate
 
 yunohost service add $app --description="Personal finance manager" --log="/var/log/$app/$app.log"
 
 #=================================================
-# SPECIFIC UPGRADE
-#=================================================
 # INSTALL WOOB WITH PIP
 #=================================================
-ynh_script_progression --message="Installing woob..." --weight=1
+ynh_script_progression "Installing woob..."
 
 # The CI will fail on these, even though the locales package is installed.
 if ! [ ${PACKAGE_CHECK_EXEC:-0} -eq 1 ]; then
@@ -94,61 +64,58 @@ if ! [ ${PACKAGE_CHECK_EXEC:-0} -eq 1 ]; then
 	update-locale C.UTF-8
 fi
 
-ynh_secure_remove --file="${install_dir}/venv"
-ynh_exec_as $app virtualenv --python=python3 --system-site-packages "${install_dir}/venv"
+ynh_safe_rm "${install_dir}/venv"
+ynh_exec_as_app virtualenv --python=python3 --system-site-packages "${install_dir}/venv"
+
 (
 	set +o nounset
 	source "${install_dir}/venv/bin/activate"
 	set -o nounset
 
-	ynh_exec_warn_less ynh_exec_as $app RUSTUP_HOME="$install_dir"/.rustup CARGO_HOME="$install_dir"/.cargo bash -c 'curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -q -y --default-toolchain=stable --profile=minimal'
+	ynh_hide_warnings ynh_exec_as_app RUSTUP_HOME="$install_dir"/.rustup CARGO_HOME="$install_dir"/.cargo bash -c 'curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -q -y --default-toolchain=stable --profile=minimal'
 	export PATH="$install_dir/.cargo/bin:$PATH"
-	ynh_exec_warn_less ynh_exec_as $app env PATH=$PATH pip install --upgrade pip
-	ynh_exec_warn_less ynh_exec_as $app env PATH=$PATH pip install --upgrade 'setuptools<71'
-	ynh_exec_warn_less ynh_exec_as $app env PATH=$PATH pip install woob simplejson BeautifulSoup4 PyExecJS typing-extensions pdfminer.six Pillow chompjs --ignore-installed
-	ynh_secure_remove --file="$install_dir/.cargo"
-	ynh_secure_remove --file="$install_dir/.rustup"
-	ynh_secure_remove --file="$install_dir/.cache"
-	ynh_secure_remove --file="$install_dir/.local"
+	ynh_hide_warnings ynh_exec_as_app PATH=$PATH pip install --upgrade pip
+	ynh_hide_warnings ynh_exec_as_app PATH=$PATH pip install --upgrade 'setuptools<71'
+	ynh_hide_warnings ynh_exec_as_app PATH=$PATH pip install woob simplejson BeautifulSoup4 PyExecJS typing-extensions pdfminer.six Pillow chompjs --ignore-installed
+	ynh_safe_rm "$install_dir/.cargo"
+	ynh_safe_rm "$install_dir/.rustup"
+	ynh_safe_rm "$install_dir/.cache"
+	ynh_safe_rm "$install_dir/.local"
 )
 
 #=================================================
 # INSTALL KRESUS WITH NPM
 #=================================================
-ynh_script_progression --message="Installing app..." --weight=1
+ynh_script_progression "Installing $app..."
 
 pushd $install_dir
- 	ynh_use_nodejs
+
 	# In case of nodejs upgrade, remove the current node_modules to make sure there are no errors
 	# linked to modules compiled for the previous version.
-	ynh_secure_remove --file="$install_dir/node_modules"
-
-	ynh_exec_warn_less ynh_exec_as $app env $ynh_node_load_PATH yarn config set network-timeout 300000
-	ynh_exec_warn_less ynh_exec_as $app env $ynh_node_load_PATH yarn install --production
-	ynh_exec_warn_less ynh_exec_as $app env $ynh_node_load_PATH yarn cache clean --all
-	ynh_secure_remove --file="$install_dir/.cache"
-	ynh_secure_remove --file="$install_dir/.yarn"
+	ynh_safe_rm "$install_dir/node_modules"
+	ynh_hide_warnings ynh_exec_as_app yarn config set network-timeout 300000
+	ynh_hide_warnings ynh_exec_as_app yarn install --production
+	ynh_hide_warnings ynh_exec_as_app yarn cache clean --all
+	ynh_safe_rm "$install_dir/.cache"
+	ynh_safe_rm "$install_dir/.yarn"
 popd
 
 #=================================================
 # UPDATE A CONFIG FILE
 #=================================================
-ynh_script_progression --message="Updating a configuration file..." --weight=1
+ynh_script_progression "Updating configuration..."
 
-ynh_add_config --template="../conf/config.ini" --destination="$install_dir/config.ini"
-
-chmod 400 "$install_dir/config.ini"
-chown $app:$app "$install_dir/config.ini"
+ynh_config_add --template="config.ini" --destination="$install_dir/config.ini"
 
 #=================================================
 # START SYSTEMD SERVICE
 #=================================================
-ynh_script_progression --message="Starting a systemd service..." --weight=1
+ynh_script_progression "Starting $app's systemd service..."
 
-ynh_systemd_action --service_name=$app --action="start" --log_path=systemd --line_match="Server is ready"
+ynh_systemctl --service=$app --action="start" --log_path=systemd --wait_until="Server is ready"
 
 #=================================================
 # END OF SCRIPT
 #=================================================
 
-ynh_script_progression --message="Upgrade of $app completed" --last
+ynh_script_progression "Upgrade of $app completed"
