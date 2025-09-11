@@ -7,7 +7,7 @@ name = "Kresus"
 description.en = "Personal finance manager"
 description.fr = "Outil personnel de gestion de finances"
 
-version = "0.23.0~ynh1"
+version = "0.23.1~ynh1"
 
 maintainers = ["Nicolas <nicofrand> Frandeboeuf"]
 
@@ -46,8 +46,8 @@ ram.runtime = "50M"
 
 [resources]
     [resources.sources.main]
-    url = "https://framagit.org/kresusapp/kresus/-/archive/0.23.0/kresus-0.23.0.tar.bz2"
-    sha256 = "eb86175e1e15eee937270208f108a17c6097b453f03a5e855c444f8aad611188"
+    url = "https://framagit.org/kresusapp/kresus/-/archive/0.23.1/kresus-0.23.1.tar.bz2"
+    sha256 = "cd62b12eb8ea07a408f94e1a65f55e5b0480677f147a735d22437fe277ea11ac"
     autoupdate.strategy = "latest_gitlab_tag"
 
     [resources.system_user]
