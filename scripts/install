@@ -62,7 +62,16 @@ ynh_exec_as_app virtualenv --python=python3 --system-site-packages "${install_di
 )
 
 #=================================================
-# INSTALL KRESUS WITH NPM
+# INSTALL COREPACK/YARN DEPENDENCIES
+#=================================================
+ynh_script_progression "Installing corepack/yarn dependencies..."
+
+ynh_hide_warnings npm install -g corepack@latest
+ynh_hide_warnings corepack enable
+ynh_hide_warnings corepack prepare yarn@1.22.22 --activate
+
+#=================================================
+# INSTALL KRESUS WITH YARN
 #=================================================
 ynh_script_progression "Installing $app..."
 
