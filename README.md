@@ -27,7 +27,7 @@ Personal finance manager
 
 [![Automatic tests level](https://apps.yunohost.org/badge/cilevel/kresus)](https://ci-apps.yunohost.org/ci/apps/kresus/)
 
-🛠️ Upstream Kresus repository: <https://framagit.org/kresusapp/kresus>
+🛠️ Upstream Kresus repository: <https://codeberg.org/kresus/kresus>
 
 Pull request are welcome and should target the [`testing` branch](https://github.com/YunoHost-Apps/kresus_ynh/tree/testing).
 
