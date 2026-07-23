@@ -7,7 +7,7 @@ name = "Kresus"
 description.en = "Personal finance manager"
 description.fr = "Outil personnel de gestion de finances"
 
-version = "0.25.1~ynh1"
+version = "0.25.2~ynh1"
 
 maintainers = ["Nicolas <nicofrand> Frandeboeuf"]
 
@@ -45,8 +45,8 @@ ram.runtime = "50M"
 
 [resources]
     [resources.sources.main]
-    url = "https://codeberg.org/kresus/kresus/archive/0.25.1.tar.gz"
-    sha256 = "f9da3ac9fc6e7e671887880f2b0c81cd8d87f621d6f91313b558700b8cfe4e83"
+    url = "https://codeberg.org/kresus/kresus/archive/0.25.2.tar.gz"
+    sha256 = "9caafa833325e82d5276260e73f03f90d1a74886b2a2d050ed6c4877b467db1e"
     autoupdate.strategy = "latest_forgejo_tag"
 
     [resources.system_user]
