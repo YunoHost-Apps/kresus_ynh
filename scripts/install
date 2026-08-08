@@ -90,6 +90,11 @@ ynh_script_progression "Adding $app's configuration..."
 
 ynh_config_add --template="config.ini" --destination="$install_dir/config.ini"
 
+# Make sure the app user owns all data (e.g. leftover fakemodules from a
+# previous install with a different UID), so Kresus's startup recursiveChmod
+# does not fail with EACCES. See issue #225.
+chown -R $app:$app "$data_dir"
+
 #=================================================
 # START SYSTEMD SERVICE
 #=================================================
