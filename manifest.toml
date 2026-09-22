@@ -16,7 +16,7 @@ license = "AGPL-3.0-only"
 website = "https://kresus.org"
 demo = "https://kresus.org/en/demo.html"
 admindoc = "https://kresus.org/en/doc.html"
-code = "https://codeberg.org/kresus/kresus"
+code = "https://git.kresus.org/kresus/kresus"
 
 [integration]
 yunohost = ">= 12.1.38"
@@ -45,8 +45,8 @@ ram.runtime = "50M"
 
 [resources]
     [resources.sources.main]
-    url = "https://codeberg.org/kresus/kresus/archive/0.25.4.tar.gz"
-    sha256 = "b5f7e8baa7ceabfabd6c11360315223ae1a1a837bb466e6f94109dd37c11ad29"
+    url = "https://git.kresus.org/kresus/kresus/archive/0.25.4.tar.gz"
+    sha256 = "ebe992512b4faa5dc26bc5cd7731d581858c47964e442abcea731b31a2d20c09"
     autoupdate.strategy = "latest_forgejo_tag"
 
     [resources.system_user]
