@@ -7,7 +7,7 @@ name = "Kresus"
 description.en = "Personal finance manager"
 description.fr = "Outil personnel de gestion de finances"
 
-version = "0.25.4~ynh1"
+version = "0.26.0~ynh1"
 
 maintainers = ["Nicolas <nicofrand> Frandeboeuf"]
 
@@ -45,8 +45,8 @@ ram.runtime = "50M"
 
 [resources]
     [resources.sources.main]
-    url = "https://git.kresus.org/kresus/kresus/archive/0.25.4.tar.gz"
-    sha256 = "ebe992512b4faa5dc26bc5cd7731d581858c47964e442abcea731b31a2d20c09"
+    url = "https://git.kresus.org/kresus/kresus/archive/0.26.0.tar.gz"
+    sha256 = "8ff32a88fd13414b6af9736fb181c52a38727c302c01a75a3197155f52198f2c"
     autoupdate.strategy = "latest_forgejo_tag"
 
     [resources.system_user]
